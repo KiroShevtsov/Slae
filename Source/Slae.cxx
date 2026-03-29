@@ -24,3 +24,6 @@ Vector Solve(const std::vector<double>& a, const std::vector<double>& b, const s
     }
     return Vector(x);
 }
+double Hausholder(double coordinate){
+    /*do something*/
+}

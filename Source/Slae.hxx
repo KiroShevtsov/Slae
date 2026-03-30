@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <stdexcept>
+#include <cmath>
 #include <map>
 class Vector{
     std::vector<double> v_;
@@ -37,6 +38,10 @@ public:
     const double& operator[](std::size_t i) const {return v_[i];}
     bool operator==(const Vector& o) const {return v_ == o.v_;}
 };
+inline double Norm(const Vector& v) {
+    if(v.dim == 0) {throw std::invalid_argument("vector empty");}
+    return std::sqrt(v * v);
+}
 double Vector::operator*(const Vector& o) const {
     if(v_.size() != o.v_.size()) {throw std::invalid_argument("Impossible to mult vectors");}
     double res = 0;
@@ -132,3 +137,5 @@ public:
 };
 /*Solve with sweep method*/
 Vector Solve(const std::vector<double>& a, const std::vector<double>& b, const std::vector<double>& c, const Vector& d);
+/*qr decomposition*/
+std::pair<Matrix, Matrix> Qr(const Matrix& mtx);

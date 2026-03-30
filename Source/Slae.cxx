@@ -24,6 +24,65 @@ Vector Solve(const std::vector<double>& a, const std::vector<double>& b, const s
     }
     return Vector(x);
 }
-double Hausholder(double coordinate){
-    /*do something*/
+Vector Hausholder(const Vector& v, const Vector& x) {return x + v * (-(v * x) / (v * v));}
+/*match the column with numbe N in matrix a*/
+Vector Subcolumn(const Matrix& a, std::size_t column_N){
+    std::vector<double> res;
+        res.reserve(a.ny_);
+        for(std::size_t i = 0; i < a.ny_; ++i){
+            double a_il = a(i, column_N);
+            res.push_back(a_il);
+        }
+        return res;
+}
+std::pair<Matrix, Matrix> Qr(const Matrix& mtx) {
+    if(mtx.data().empty()){throw std::invalid_argument("matrix is empty");}
+    Matrix r = mtx;
+    std::vector<double> qVec(mtx.ny_ * mtx.ny_);
+    for(std::size_t i = 0; i < mtx.ny_; ++i){
+        qVec[i * mtx.nx_ + i] = 1;
+    }
+    Matrix q(mtx.ny_, mtx.ny_, qVec);
+
+    for(std::size_t l = 0; l < std::min(mtx.nx_, mtx.ny_); ++l){
+        Vector subColumn = Subcolumn(mtx, l);
+        std::vector<double> xVec;
+        for(std::size_t f = l; f < mtx.ny_; ++f){
+            xVec.push_back(subColumn[f]);
+        }
+        Vector x(xVec);
+        double norm_x = Norm(x);
+        double sign = (x[0] > 0) ? -norm_x : norm_x;
+        std::vector<double> vVec(x.dim);
+        vVec[0] = x[0] - sign;
+        for(std::size_t i = 1; i < x.dim; ++i){
+            vVec[i] = x[i];
+        }
+        Vector v(vVec);
+        for(std::size_t j = l; j < mtx.nx_; ++j){
+            std::vector<double> colVec;
+            for(std::size_t i = l; i < mtx.ny_; ++i){
+                colVec.push_back(r(i, j));
+            }
+            Vector column_j(colVec);
+            Vector newColumn_j = Hausholder(v, column_j);
+            
+            for(std::size_t i = 0; i < newColumn_j.dim; ++i){
+                r(l + i, j) = newColumn_j[i];
+            }
+        }
+        double vv = v * v;
+        for(std::size_t i = 0; i < mtx.ny_; ++i){
+            std::vector<double> rowVec;
+            for(std::size_t j = l; j < mtx.ny_; ++j){
+                rowVec.push_back(q(i, j));
+            }
+            Vector row(rowVec);
+            double factor = 2 * (v * row) / (vv);
+            for(std::size_t j = 0; j < v.dim; ++j){
+                q(i, j + l) = row[j] - factor * v[j];
+            }
+        }
+    }
+    return {q, r};
 }

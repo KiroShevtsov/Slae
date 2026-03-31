@@ -139,3 +139,5 @@ public:
 Vector Solve(const std::vector<double>& a, const std::vector<double>& b, const std::vector<double>& c, const Vector& d);
 /*qr decomposition*/
 std::pair<Matrix, Matrix> Qr(const Matrix& mtx);
+/*solve with QR Ax = b*/
+Vector Solve(const Matrix& mtx, const Vector& b);

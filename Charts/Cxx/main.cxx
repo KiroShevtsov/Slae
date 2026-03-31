@@ -86,7 +86,7 @@ int CalculateSpeed(){
     return 0;
 }
 int main(){
-    Matrix a(4, 2, std::vector<double>({1, 2, 3, 4, 5, 6, 7, 8}));
+    Matrix a(3, 3, std::vector<double>({1, 0, 0, 0, 1, 0, 0,0 ,1}));
     auto [q, r] = Qr(a);
     std::cout << "Q" << "\n";
     Printmtx(q);

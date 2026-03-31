@@ -36,6 +36,7 @@ Vector Hausholder(const Vector& v, const Vector& x){
     Matrix r = mtx;
     std::size_t rows = mtx.ny_;
     std::size_t cols = mtx.nx_;
+
     std::vector<double> qVec(rows * rows);
     for(std::size_t i = 0; i < rows; ++i){
         qVec[i * rows + i] = 1;
@@ -51,11 +52,12 @@ Vector Hausholder(const Vector& v, const Vector& x){
         double norm = Norm(x);
         double sign = (x[0] > 0) ? -norm : norm;
         std::vector<double> vVec(x.dim);
-        vVec[0] = x[0] - sign;
+        vVec[0] = x[0] + sign;
         for(std::size_t i = 1; i < x.dim; ++i) {
             vVec[i] = x[i];
         }
         Vector v(vVec);
+        if(v * v == 0){continue;}
         for(std::size_t j = l; j < cols; ++j) {
             std::vector<double> colVec;
             for(std::size_t i = l; i < rows; ++i) {

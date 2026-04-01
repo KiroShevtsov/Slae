@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include "../Source/Slae.hxx"
-TEST(Sweep, SweepTest){
+TEST(Tridiagonal_method, SweepTest){
     std::vector<double> solve1 = {1, 4, 5};
     Vector  ksi = Solve({0, 0}, {1, 1, 1}, {0, 0}, solve1);
     ASSERT_EQ(ksi , Vector({1, 4, 5}));

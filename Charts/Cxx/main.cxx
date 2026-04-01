@@ -26,16 +26,8 @@ std::vector<double> Mtx(std::size_t nx, std::size_t ny, double alpha, double min
     }
     return res;
 }
-void Printmtx(const Matrix& mtx){
-    for(std::size_t i = 0; i < mtx.ny_; ++i){
-        for(std::size_t j = 0; j  < mtx.nx_; ++j){
-            std::cout << mtx(i, j) << " ";
-        }
-        std::cout << std::endl;
-    }
-    return;
-}
-int CalculateSpeed(){
+#if 0
+int main(){
     try{
         std::size_t nx = 1000;
         std::size_t ny = 1000;
@@ -85,12 +77,5 @@ int CalculateSpeed(){
     }
     return 0;
 }
-int main(){
-    Matrix a(3, 3, std::vector<double>({1, 0, 0, 0, 1, 0, 0,0 ,1}));
-    auto [q, r] = Qr(a);
-    std::cout << "Q" << "\n";
-    Printmtx(q);
-    std::cout << "r" << "\n";
-    Printmtx(r);
-    return 0;
-}
+#endif
+int main(){}

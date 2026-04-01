@@ -46,7 +46,7 @@ Vector Hausholder(const Vector& v, const Vector& x){
     for(std::size_t l = 0; l < std::min(cols, rows); ++l){
         std::vector<double> xVec;
         for(std::size_t f = l; f < rows; ++f){
-            xVec.push_back(r(f, l));
+            xVec.push_back(mtx(f, l));
         }
         Vector x(xVec);
         double norm = Norm(x);
@@ -61,7 +61,7 @@ Vector Hausholder(const Vector& v, const Vector& x){
         for(std::size_t j = l; j < cols; ++j) {
             std::vector<double> colVec;
             for(std::size_t i = l; i < rows; ++i) {
-                colVec.push_back(r(i, j));
+                colVec.push_back(mtx(i, j));
             }
             Vector column_j(colVec);
             Vector newColumn_j = Hausholder(v, column_j);
@@ -77,7 +77,7 @@ Vector Hausholder(const Vector& v, const Vector& x){
             Vector row_j(rowVec);
             Vector newRow_j = Hausholder(v, row_j);
             for(std::size_t j = 0; j < newRow_j.dim; ++j) {
-                q(i, j + l) = newRow_j[i];
+                q(i, j + l) = newRow_j[j];
             }
         }
     }

@@ -18,6 +18,7 @@ find_package(GTest REQUIRED)
 add_executable(slae_test 
     Test/operations.cxx
     Test/sweep_method.cxx
+    Test/qr.cxx
 )
 target_link_libraries(slae_test PRIVATE slae_lib GTest::gtest_main)
 target_include_directories(slae_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Source ${GTEST_INCLUDE_DIRS})

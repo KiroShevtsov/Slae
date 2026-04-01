@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <ostream>
 #include <stdexcept>
 #include <cmath>
 #include <map>
@@ -38,6 +39,13 @@ public:
     const double& operator[](std::size_t i) const {return v_[i];}
     bool operator==(const Vector& o) const {return v_ == o.v_;}
 };
+inline std::ostream& operator<<(std::ostream& os, const Vector& v){
+    std::string whitesp = " ";
+    for(const auto& item : v.data()){
+        os << item << whitesp;
+    }
+    return os;
+}
 inline double Norm(const Vector& v) {
     if(v.dim == 0) {throw std::invalid_argument("vector empty");}
     return std::sqrt(v * v);
@@ -83,6 +91,16 @@ public:
         return {res};
     }
 };
+inline std::ostream& operator<<(std::ostream& os, const Matrix& matrix){
+    std::string whitesp = " ";
+    for(std::size_t i = 0; i < matrix.ny_; ++i){
+        for(std::size_t j = 0; j < matrix.nx_; ++j){
+            os << matrix(i, j) << whitesp;
+        }
+        os << std::endl;
+    }
+    return os;
+}
 class SparseMatrix{
     using S = std::map<std::pair<std::size_t, std::size_t>, double>;
     std::vector<double> values_;

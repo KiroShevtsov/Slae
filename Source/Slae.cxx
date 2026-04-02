@@ -49,11 +49,11 @@ Vector Hausholder(const Vector& v, const Vector& x){
             xVec.push_back(mtx(f, l));
         }
         Vector x(xVec);
-        double norm = Norm(x);
-        double sign = (x[0] > 0) ? -norm : norm;
+        double xNorm = Norm(x);
+        std::pair<double, double> sign_v = {x[0] + xNorm, x[0] - xNorm};
         std::vector<double> vVec(x.dim);
-        vVec[0] = x[0] + sign;
-        for(std::size_t i = 1; i < x.dim; ++i) {
+        vVec[0] = (std::abs(sign_v.first) > std::abs(sign_v.second)) ? sign_v.first : sign_v.second;
+        for(std::size_t i = 1; i < x.dim; ++i){
             vVec[i] = x[i];
         }
         Vector v(vVec);
@@ -61,7 +61,7 @@ Vector Hausholder(const Vector& v, const Vector& x){
         for(std::size_t j = l; j < cols; ++j) {
             std::vector<double> colVec;
             for(std::size_t i = l; i < rows; ++i) {
-                colVec.push_back(mtx(i, j));
+                colVec.push_back(r(i, j));
             }
             Vector column_j(colVec);
             Vector newColumn_j = Hausholder(v, column_j);
@@ -84,28 +84,30 @@ Vector Hausholder(const Vector& v, const Vector& x){
     return {q, r};
 }
 [[nodiscard]] Vector Solve(const Matrix& mtx, const Vector& b){
+    if(mtx.nx_ != mtx.ny_){throw std::invalid_argument("Matrix is not square");}
     auto [q, r] = Qr(mtx);
+    if(q.nx_ != b.dim) {throw std::invalid_argument("Incorrect qr");}
     /*creating Q^Tb*/
     std::vector<double> y;
-    y.reserve(q.ny_);
-    for(std::size_t j = 0; j < q.ny_; ++j){
+    y.reserve(q.nx_);
+    for(std::size_t j = 0; j < q.nx_; ++j){
         double qTb = 0;
-        for(std::size_t i = 0; i < q.nx_; ++i){
-            qTb += q(i, j) * b[j];
+        for(std::size_t i = 0; i < q.ny_; ++i){
+            qTb += q(i, j) * b[i];
         }
         y.push_back(qTb);
     }
-    std::size_t n = b.dim;
+    std::size_t n = y.size();
     std::vector<double> x(n);
     /*beginnig from the end*/
-    x[n - 1] = b[n - 1] / r(n - 1, n - 1);
-    for(std::size_t l = n - 1; l > 0; --l){
+    if(r(n - 1, n - 1) == 0) {throw std::runtime_error("Matrix is singular");}
+    x[n - 1] = y[n - 1] / r(n - 1, n - 1);
+    for (long long l = static_cast<long long>(n) - 2; l >= 0; --l) {
         double linearCombination = 0;
-        for(std::size_t j = l; j < n; ++j){
+        for (std::size_t j = static_cast<std::size_t>(l) + 1; j < n; ++j) {
             linearCombination += r(l, j) * x[j];
         }
-        double solveX_i = (y[l] - linearCombination) / r(l, l);
-        x[l] = solveX_i;
+        x[l] = (y[l] - linearCombination) / r(l, l);
     }
     return Vector(x);
 }

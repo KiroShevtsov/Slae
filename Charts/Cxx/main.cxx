@@ -10,6 +10,7 @@ template <typename T> double IterationTime(T&& function, std::size_t iter){
     std::chrono::duration<double> tau = end - start;
     return tau.count() / iter;
 }
+/*alpha - is density of matrix*/
 std::vector<double> Mtx(std::size_t nx, std::size_t ny, double alpha, double min = 0, double max = 10){
     std::size_t size = nx * ny;
     std::vector<double> res(size);
@@ -78,4 +79,14 @@ int main(){
     return 0;
 }
 #endif
-int main(){}
+int main(){
+    std::size_t n = 3;
+    std::vector<double> mtxVec = Mtx(n, n, 1, 0, 1);
+    Matrix mtx(n, n, mtxVec);
+    auto [q, r] = Qr(mtx);
+    std::ofstream file("data.txt");
+    file << "X" << "\n" << mtx;
+    file << "Q" << "\n" << q;
+    file << "R" << "\n" << r;
+    return 0;
+}

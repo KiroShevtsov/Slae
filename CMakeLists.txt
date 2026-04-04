@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_library(slae_lib STATIC 
     Source/Tridiagonal.cxx
     Source/Qr.cxx
+    Source/Sim.cxx
 )
 target_include_directories(slae_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Source)
 

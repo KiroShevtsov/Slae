@@ -14,4 +14,4 @@ std::pair<Vector, double> SimpleIteration(const SparseMatrix& p, const Vector& b
     }
     return {v, delta};
 }
-[[nodiscard]] Vector Solve(const SparseMatrix& mtx, const Vector& b, const Vector& xBegin){}
+[[nodiscard]] Vector Solve(const SparseMatrix& mtx, const Vector& b, const Vector& xBegin, std::size_t iter, double tol){}

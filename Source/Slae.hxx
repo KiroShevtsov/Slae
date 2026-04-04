@@ -159,3 +159,5 @@ public:
 [[nodiscard]] std::pair<Matrix, Matrix> Qr(const Matrix& mtx);
 /*solve with QR Ax = b*/
 [[nodiscard]] Vector Solve(const Matrix& mtx, const Vector& b);
+/*solve with sim method, mtx*(x) = v*/
+[[nodiscard]] Vector Solve(const SparseMatrix& mtx, const Vector& v, const Vector& xBegin);

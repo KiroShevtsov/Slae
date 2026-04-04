@@ -5,13 +5,18 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_library(slae_lib STATIC 
-    Source/Slae.cxx
+    Source/Tridiagonal.cxx
+    Source/Qr.cxx
 )
 target_include_directories(slae_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Source)
 
-add_executable(${PROJECT_NAME} Charts/Cxx/main.cxx)
+#dense and sparse mtx
+add_executable(sparse_and_dense Charts/Cxx/main.cxx)
+target_link_libraries(sparse_and_dense PRIVATE slae_lib)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE slae_lib)
+#qr
+add_executable(qr_plot  Charts/Cxx/qr.cxx)
+target_link_libraries(qr_plot PRIVATE slae_lib)
 
 enable_testing()
 find_package(GTest REQUIRED)

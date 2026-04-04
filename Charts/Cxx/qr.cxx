@@ -3,7 +3,7 @@
 #include <random>
 #include <iostream>
 /*alpha - is density of matrix*/
-inline std::vector<double> Mtx(std::size_t nx, std::size_t ny, double alpha, double min = 0, double max = 10){
+std::vector<double> Mtx(std::size_t nx, std::size_t ny, double alpha, double min = 0, double max = 10){
     std::size_t size = nx * ny;
     std::vector<double> res(size);
     

@@ -24,6 +24,18 @@ public:
         }
         return res;
     }
+
+    Vector operator-(const Vector& o) const {
+        if(v_.size() != o.v_.size()) {throw std::invalid_argument("Vectors have different dimensions");}
+        std::vector<double> res;
+        res.reserve(v_.size());
+        for(std::size_t i = 0; i < v_.size(); ++i) {
+            double r = v_[i] - o.v_[i];
+            res.push_back(r);
+        }
+        return res;
+    }
+
     Vector operator*(double a) const {
         std::vector<double> res;
         res.reserve(v_.size());
@@ -159,5 +171,10 @@ public:
 [[nodiscard]] std::pair<Matrix, Matrix> Qr(const Matrix& mtx);
 /*solve with QR Ax = b*/
 [[nodiscard]] Vector Solve(const Matrix& mtx, const Vector& b);
-/*solve with sim method, mtx @ x = b*/
-[[nodiscard]] Vector Solve(const SparseMatrix& mtx, const Vector& b, const Vector& xBegin);
+/*solve with sim method, sparse_mtx @ x = b with absolute error*/
+[[nodiscard]] std::pair<Vector, double> Solve(const SparseMatrix& mtx, const Vector& b,
+                                     const Vector& xBegin, std::size_t iter, double tau, double tol);
+/*solve with jacobi method*/
+[[nodiscard]] std::pair<Vector, double> Jacobi(const SparseMatrix& mtx, const Vector b, const Vector& vBegin, std::size_t iter);
+/*gauss-zeidel method*/
+[[nodiiscard]] std::pair<Vector, double> GaussZeidel(const SparseMatrix& mtx, const Vector& b, const Vector& vBegin, std::size_t iter);

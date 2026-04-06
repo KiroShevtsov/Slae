@@ -21,7 +21,7 @@ Vector Hausholder(const Vector& v, const Vector& x){
             xVec.push_back(mtx(f, l));
         }
         Vector x(xVec);
-        double xNorm = Norm(x);
+        double xNorm = EuclidNorm(x);
         std::pair<double, double> sign_v = {x[0] + xNorm, x[0] - xNorm};
         std::vector<double> vVec(x.dim);
         vVec[0] = (std::abs(sign_v.first) > std::abs(sign_v.second)) ? sign_v.first : sign_v.second;

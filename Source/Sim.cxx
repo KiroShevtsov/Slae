@@ -13,11 +13,11 @@ struct IterationArgs{
 std::pair<Vector, double> SimpleIteration(const IterationArgs& args){
     if(args.a_.nx_ != args.a_.ny_) {throw std::invalid_argument("matrix is not square");}
     Vector v = args.vBegin_;
-    double delta = Norm(args.a_ * v - args.b_);
+    double delta = EuclidNorm(args.a_ * v - args.b_);
     for(std::size_t l = 0; l < args.iter_; ++l){
         Vector vCurrent = v - (args.a_ * v - args.b_) * args.tau_;
         /*current r = Ax - b*/
-        double error = Norm(args.a_ * vCurrent - args.b_);
+        double error = EuclidNorm(args.a_ * vCurrent - args.b_);
         if(error < args.tolerance_){
             double absoluteDelta = std::abs(args.tolerance_ - error);
             return {v, absoluteDelta};
@@ -52,10 +52,10 @@ std::pair<Vector, double> SimpleIteration(const IterationArgs& args){
             v[k] = (1 / diagonalMtx) * (b[k] - lux);
         }
     }
-    delta = Norm(mtx * v - b);
+    delta = EuclidNorm(mtx * v - b);
     return {v, delta};
 }
-[[nodiiscard]] std::pair<Vector, double> GaussZeidel(const SparseMatrix& mtx, const Vector& b, const Vector& vBegin, std::size_t iter){
+[[nodiscard]] std::pair<Vector, double> GaussZeidel(const SparseMatrix& mtx, const Vector& b, const Vector& vBegin, std::size_t iter){
     if (mtx.ny_ != mtx.nx_) {throw std::invalid_argument("matrix is not square");}
     Vector v = vBegin;
     double delta = 0;
@@ -73,6 +73,6 @@ std::pair<Vector, double> SimpleIteration(const IterationArgs& args){
             v[k] = (1 / diagonalMtx) * (b[k] - p - q);
         }
     }
-    delta = Norm(mtx * v - b);
+    delta = EuclidNorm(mtx * v - b);
     return {v, delta};
 }

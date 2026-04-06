@@ -58,7 +58,7 @@ inline std::ostream& operator<<(std::ostream& os, const Vector& v){
     }
     return os;
 }
-inline double Norm(const Vector& v) {
+inline double EuclidNorm(const Vector& v) {
     if(v.dim == 0) {throw std::invalid_argument("vector empty");}
     return std::sqrt(v * v);
 }
@@ -177,4 +177,4 @@ public:
 /*solve with jacobi method*/
 [[nodiscard]] std::pair<Vector, double> Jacobi(const SparseMatrix& mtx, const Vector b, const Vector& vBegin, std::size_t iter);
 /*gauss-zeidel method*/
-[[nodiiscard]] std::pair<Vector, double> GaussZeidel(const SparseMatrix& mtx, const Vector& b, const Vector& vBegin, std::size_t iter);
+[[nodiscard]] std::pair<Vector, double> GaussZeidel(const SparseMatrix& mtx, const Vector& b, const Vector& vBegin, std::size_t iter);

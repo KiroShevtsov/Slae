@@ -175,6 +175,6 @@ public:
 [[nodiscard]] std::pair<Vector, double> Solve(const SparseMatrix& mtx, const Vector& b,
                                      const Vector& xBegin, std::size_t iter, double tau, double tol);
 /*solve with jacobi method*/
-[[nodiscard]] std::pair<Vector, double> Jacobi(const SparseMatrix& mtx, const Vector b, const Vector& vBegin, std::size_t iter);
+[[nodiscard]] std::pair<Vector, double> Jacobi(const SparseMatrix& mtx, const Vector& b, const Vector& vBegin, std::size_t iter);
 /*gauss-zeidel method*/
 [[nodiscard]] std::pair<Vector, double> GaussZeidel(const SparseMatrix& mtx, const Vector& b, const Vector& vBegin, std::size_t iter);

@@ -51,8 +51,8 @@ std::pair<Vector, double> SimpleIteration(const IterationArgs& args){
             }
             v[k] = (1 / diagonalMtx) * (b[k] - lux);
         }
-        delta = Norm(mtx * v - b);
     }
+    delta = Norm(mtx * v - b);
     return {v, delta};
 }
 [[nodiiscard]] std::pair<Vector, double> GaussZeidel(const SparseMatrix& mtx, const Vector& b, const Vector& vBegin, std::size_t iter){
@@ -72,7 +72,7 @@ std::pair<Vector, double> SimpleIteration(const IterationArgs& args){
             for (std::size_t j = k + 1; j < mtx.ny_; ++j) {q += mtx(k, j) * v[j];}
             v[k] = (1 / diagonalMtx) * (b[k] - p - q);
         }
-        delta = Norm(mtx * v - b);
     }
+    delta = Norm(mtx * v - b);
     return {v, delta};
 }

@@ -11,7 +11,7 @@ template <typename T> double IterationTime(T&& function, std::size_t iter){
     return tau.count() / iter;
 }
 /*alpha - is density of matrix*/
-inline std::vector<double> Mtx(std::size_t nx, std::size_t ny, double alpha, double min = 0, double max = 10){
+inline std::vector<double> CreateDense(std::size_t nx, std::size_t ny, double alpha, double min = 0, double max = 10){
     std::size_t size = nx * ny;
     std::vector<double> res(size);
     
@@ -53,7 +53,7 @@ int main(){
         using key = std::pair<std::size_t, std::size_t>;
         
         for(const auto& alpha : density){
-            std::vector<double> current = Mtx(nx, ny, alpha);
+            std::vector<double> current = CreateDense(nx, ny, alpha);
             Matrix first(nx, ny, current);
 
             std::map<key, double> m;

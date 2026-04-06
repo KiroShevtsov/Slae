@@ -34,7 +34,7 @@ std::pair<Vector, double> SimpleIteration(const IterationArgs& args){
     auto solve = SimpleIteration(args);
     return solve;
 }
-[[nodiscard]] std::pair<Vector, double> Jacobi(const SparseMatrix& mtx, const Vector b, const Vector& vBegin, std::size_t iter){
+[[nodiscard]] std::pair<Vector, double> Jacobi(const SparseMatrix& mtx, const Vector& b, const Vector& vBegin, std::size_t iter){
     if (mtx.nx_ != mtx.ny_) {throw std::invalid_argument("matrix is not square");}
     Vector v = vBegin;
     double delta = 0;

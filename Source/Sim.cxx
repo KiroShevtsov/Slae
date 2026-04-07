@@ -20,7 +20,7 @@ std::pair<Vector, double> SimpleIteration(const IterationArgs& args){
         double error = EuclidNorm(args.a_ * vCurrent - args.b_);
         if(error < args.tolerance_){
             double absoluteDelta = std::abs(args.tolerance_ - error);
-            return {v, absoluteDelta};
+            return {vCurrent, absoluteDelta};
         }
         delta = error;
         v = vCurrent;
@@ -41,16 +41,19 @@ std::pair<Vector, double> SimpleIteration(const IterationArgs& args){
     /*anti-singular stabilisation*/
     const double lambda = 1e-3;
     for(std::size_t i = 0; i < iter; ++i){
+        /*vector on i-iter*/
+        Vector vCurrent = v;
         for(std::size_t k = 0; k < mtx.ny_; ++k){
             double diagonalMtx = mtx(k, k);
             if(diagonalMtx == 0) {diagonalMtx += lambda;}
             /*(l + u) @ x*/
             double lux = 0;
-            for(std::size_t j = 0; j < mtx.ny_; ++j) {
-                if (i != j) {lux += mtx(i, j) * v[j];}
+            for(std::size_t j = 0; j < mtx.nx_; ++j) {
+                if (j != k) {lux += mtx(k, j) * vCurrent[j];}
             }
-            v[k] = (1 / diagonalMtx) * (b[k] - lux);
+            vCurrent[k] = (1 / diagonalMtx) * (b[k] - lux);
         }
+        v = vCurrent;
     }
     delta = EuclidNorm(mtx * v - b);
     return {v, delta};

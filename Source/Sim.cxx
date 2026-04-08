@@ -19,13 +19,13 @@ std::pair<Vector, double> SimpleIteration(const IterationArgs& args){
         /*current r = Ax - b*/
         double error = EuclidNorm(args.a_ * vCurrent - args.b_);
         if(error < args.tolerance_){
-            double absoluteDelta = std::abs(args.tolerance_ - error);
+            double absoluteDelta = std::abs(error);
             return {vCurrent, absoluteDelta};
         }
-        delta = error;
+        delta = std::abs(error);
         v = vCurrent;
     }
-    double absoluteDelta = std::abs(args.tolerance_ - delta);
+    double absoluteDelta = delta;
     return {v, absoluteDelta};
 }
 [[nodiscard]] std::pair<Vector, double> Solve(const SparseMatrix& mtx, const Vector& b, 
@@ -65,14 +65,18 @@ std::pair<Vector, double> SimpleIteration(const IterationArgs& args){
     /*anti-singular stabilisation*/
     const double lambda = 1e-3;
     for(std::size_t i = 0; i < iter; ++i){
+        Vector vCurrent = v;
         for(std::size_t k = 0; k < mtx.ny_; ++k){
             double diagonalMtx = mtx(k, k);
             if(diagonalMtx == 0) {diagonalMtx += lambda;}
             double p = 0, q = 0;
-            /*with x[i + 1]*/
-            for(std::size_t j = 1; j < k; ++j) {p += mtx(k, j) * v[j];} 
             /*with x[i]*/
-            for (std::size_t j = k + 1; j < mtx.ny_; ++j) {q += mtx(k, j) * v[j];}
+            for (std::size_t j = k + 1; j < mtx.nx_; ++j) {
+                q += mtx(k, j) * vCurrent[j];
+            }
+            for(std::size_t j = 0; j < k; ++j) {
+                p += mtx(k, j) * v[j];
+            } 
             v[k] = (1 / diagonalMtx) * (b[k] - p - q);
         }
     }

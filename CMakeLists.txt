@@ -16,12 +16,12 @@ add_executable(sparse_and_dense Charts/Cxx/main.cxx)
 target_link_libraries(sparse_and_dense PRIVATE slae_lib)
 
 #qr
-add_executable(qr_plot  Charts/Cxx/qr.cxx)
+add_executable(qr_plot Charts/Cxx/qr.cxx)
 target_link_libraries(qr_plot PRIVATE slae_lib)
 
 #sim
-# add_executable(sim_methods Charts/Cxx/simple_iteration.cxx)
-# target_link_libraries(sim_methods PRIVATE slae_lib)
+add_executable(sim_methods Charts/Cxx/simple_iteration.cxx)
+target_link_libraries(sim_methods PRIVATE slae_lib)
 
 enable_testing()
 find_package(GTest REQUIRED)

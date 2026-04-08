@@ -19,10 +19,10 @@ std::pair<Vector, double> SimpleIteration(const IterationArgs& args){
         /*current r = Ax - b*/
         double error = EuclidNorm(args.a_ * vCurrent - args.b_);
         if(error < args.tolerance_){
-            double absoluteDelta = std::abs(error);
+            double absoluteDelta = error;
             return {vCurrent, absoluteDelta};
         }
-        delta = std::abs(error);
+        delta = error;
         v = vCurrent;
     }
     double absoluteDelta = delta;

@@ -167,14 +167,23 @@ public:
 };
 /*Solve with sweep method*/
 [[nodiscard]] Vector Solve(const std::vector<double>& a, const std::vector<double>& b, const std::vector<double>& c, const Vector& d);
+
 /*qr decomposition*/
 [[nodiscard]] std::pair<Matrix, Matrix> Qr(const Matrix& mtx);
+
 /*solve with QR Ax = b*/
 [[nodiscard]] Vector Solve(const Matrix& mtx, const Vector& b);
+
 /*solve with sim method, sparse_mtx @ x = b with absolute error*/
 [[nodiscard]] std::pair<Vector, double> Solve(const SparseMatrix& mtx, const Vector& b,
                                      const Vector& xBegin, std::size_t iter, double tau, double tol);
+
 /*solve with jacobi method*/
 [[nodiscard]] std::pair<Vector, double> Jacobi(const SparseMatrix& mtx, const Vector& b, const Vector& vBegin, std::size_t iter);
+
 /*gauss-zeidel method*/
 [[nodiscard]] std::pair<Vector, double> GaussZeidel(const SparseMatrix& mtx, const Vector& b, const Vector& vBegin, std::size_t iter);
+
+/*solve with Chebyshov acceleration*/
+[[nodiscard]] std::pair<Vector, double> Tn(const SparseMatrix& mtx, const Vector& b,
+                                        const Vector& xBegin, std::size_t iter, double tolerance);

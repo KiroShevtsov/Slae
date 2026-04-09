@@ -4,6 +4,7 @@ sizes = []
 sim = []
 jacobi = []
 gz = []
+tau = 0.8
 with open("build/times.txt", "r") as file:
     for line in file:
         s = line.split()
@@ -16,9 +17,13 @@ sim = np.array(sim)
 jacobi = np.array(jacobi)
 gz = np.array(gz)
 plt.figure(figsize=(10, 6))
-plt.title("Time for 3 SIM methods")
-plt.plot(sizes, sim, label='sim')
-plt.plot(sizes, jacobi, label='jacobi')
-plt.plot(sizes, gz, label='gauss-zeidel')
+plt.title("Time for 3 SIM methods for SLE Av = 0, iter = 100")
+plt.plot(sizes, sim, label=f'sim, tau = {tau}', markevery=10, marker='s')
+plt.plot(sizes, jacobi, label=f'jacobi', markevery=10, marker='d')
+plt.plot(sizes, gz, label=f'gauss-zeidel', markevery=10, marker = 'p')
+plt.xlabel('size')
+plt.ylabel('time, sec')
 plt.legend()
+plt.grid(True)
+plt.savefig("sim.png")
 plt.show()

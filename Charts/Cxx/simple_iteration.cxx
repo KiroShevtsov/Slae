@@ -3,6 +3,7 @@
 #include <fstream>
 #include <random>
 #include <functional>
+#include <iostream>
 using key = std::pair<std::size_t, std::size_t>;
 /*alpha -  sparsity of diagonal sparse matrix, if alpha == 1, mtx is sparse, and dense in another case*/
 inline SparseMatrix CreateSparse(std::size_t nx, double alpha, double min = 0, double max = 10){
@@ -29,9 +30,8 @@ inline Vector CreateBeginX(std::size_t size){
     return Vector(res);
 }
 /*there are three main methods*/
-std::size_t countMethods = 3;
-const double tolerance = 1e-4;
-const double tau = 0.9;
+const double tolerance = 1e-10;
+const double tau = 0.8;
 const std::size_t size = 100;
 const std::size_t iter = 100;
 
@@ -45,20 +45,25 @@ inline double IterationTime(const std::function<Solver ()>& function){
     return tau.count();
 }
 int main(){
-    std::ofstream times("times.txt");
-    for(std::size_t i = 1; i <= size; ++i){
-        std::vector<double> b(i, static_cast<double>(0));
-        SparseMatrix diag = CreateSparse(i, 0.9);
-        Vector xBegin = CreateBeginX(i);
-        auto sim = [&]() {return Solve(diag, Vector(b), xBegin, iter, tau, tolerance);};
-        double simTau = IterationTime(sim);
+    try{
+        std::ofstream times("times.txt");
+        for(std::size_t i = 1; i <= size; ++i){
+            std::vector<double> b(i, static_cast<double>(0));
+            SparseMatrix diag = CreateSparse(i, 0.9);
+            Vector xBegin = CreateBeginX(i);
+            auto sim = [&]() {return Solve(diag, Vector(b), xBegin, iter, tau, tolerance);};
+            double simTau = IterationTime(sim);
 
-        auto jacobi = [&]() {return Jacobi(diag, b, xBegin, iter);};
-        double jacobiTau = IterationTime(jacobi);
+            auto jacobi = [&]() {return Jacobi(diag, b, xBegin, iter);};
+            double jacobiTau = IterationTime(jacobi);
 
-        auto gz = [&]() {return GaussZeidel(diag, b, xBegin, iter);};
-        double gzTau = IterationTime(gz);
-        times << i << " " << simTau << " " << jacobiTau << " " << gzTau << std::endl;
+            auto gz = [&]() {return GaussZeidel(diag, b, xBegin, iter);};
+            double gzTau = IterationTime(gz);
+            times << i << " " << simTau << " " << jacobiTau << " " << gzTau << std::endl;
+        }
     }
+    catch(std::exception& e){
+        std::cout << e.what() << std::endl;
+        }
     return 0;
 }

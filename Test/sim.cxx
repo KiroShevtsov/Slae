@@ -4,9 +4,9 @@
 const double tau = 0.2;
 /*required tolerance*/
 const double tolerance = 1e-4;
-std::size_t iter = 100;
+const std::size_t iter = 100;
 using key = std::pair<std::size_t, std::size_t>;
-[[nodiscard]] SparseMatrix Unit(std::size_t size){
+[[nodiscard]] inline SparseMatrix Unit(std::size_t size){
     std::map<key, double> e;
     for(std::size_t i = 0; i < size; ++i){
         e[std::make_pair(i, i)] = static_cast<double>(1);

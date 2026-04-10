@@ -5,21 +5,15 @@
 #include <functional>
 #include <iostream>
 using key = std::pair<std::size_t, std::size_t>;
-/*alpha -  sparsity of diagonal sparse matrix, if alpha == 1, mtx is sparse, and dense in another case*/
-inline SparseMatrix CreateSparse(std::size_t nx, double alpha, double min = 0, double max = 10){
-    std::map<key, double> sparse;
-    
-    std::random_device dev;
-    std::mt19937 r(dev());
-    std::uniform_real_distribution<double> values(min, max);
-    /*the probability that a random element is non-zero*/
-    std::uniform_real_distribution<double> probability(0, 1);
-    
-    for(std::size_t i = 0; i < nx; ++i){
-        double val = (probability(r) <= alpha) ? values(r) : 0;
-        sparse[std::make_pair(i, i)] = val;
+inline SparseMatrix CreateSparse(std::size_t nx){
+    std::map<key, double> m;
+    for(std::size_t i = 0; i < nx; ++i) {
+        m[std::make_pair(i,i)] = 10.0;
+        if(i > 0) m[std::make_pair(i, i - 1)] = -5.0;
+        if(i < nx - 1) m[std::make_pair(i, i + 1)] = -5.0;
     }
-    return SparseMatrix(nx, nx, sparse);
+    SparseMatrix mtx(nx, nx, m);
+    return mtx;
 }
 /*create xBegin - may be choosen any*/
 inline Vector CreateBeginX(std::size_t size){
@@ -33,11 +27,10 @@ inline Vector CreateBeginX(std::size_t size){
 const double tolerance = 1e-10;
 const double tau = 0.8;
 const std::size_t size = 100;
-const std::size_t iter = 100;
+const std::size_t iter = 128;
 
 /*measure time of solve slae*/
-using Solver = std::pair<Vector, double>;
-inline double IterationTime(const std::function<Solver ()>& function){
+inline double IterationTime(const std::function<std::pair<Vector, double> ()>& function){
     auto start = std::chrono::steady_clock::now();
     auto solve = function();
     auto end = std::chrono::steady_clock::now();
@@ -48,17 +41,23 @@ int main(){
     try{
         std::ofstream times("times.txt");
         for(std::size_t i = 1; i <= size; ++i){
-            std::vector<double> b(i, static_cast<double>(0));
-            SparseMatrix diag = CreateSparse(i, 0.9);
+            std::vector<double> b(i, static_cast<double>(std::sin(i * 0.3)));
+            SparseMatrix mtx = CreateSparse(i);
             Vector xBegin = CreateBeginX(i);
-            auto sim = [&]() {return Solve(diag, Vector(b), xBegin, iter, tau, tolerance);};
+
+            /*measuring times*/
+            auto sim = [&]() {return Solve(mtx, Vector(b), xBegin, iter, tau, tolerance);};
             double simTau = IterationTime(sim);
 
-            auto jacobi = [&]() {return Jacobi(diag, b, xBegin, iter);};
+            auto jacobi = [&]() {return Jacobi(mtx, b, xBegin, iter);};
             double jacobiTau = IterationTime(jacobi);
 
-            auto gz = [&]() {return GaussZeidel(diag, b, xBegin, iter);};
+            auto gz = [&]() {return GaussZeidel(mtx, b, xBegin, iter);};
             double gzTau = IterationTime(gz);
+
+            auto cheb = [&]() {return Tn(mtx, b, xBegin, iter, std::make_pair(4, 6), tolerance);};
+            double chebTau = IterationTime(cheb);
+
             times << i << " " << simTau << " " << jacobiTau << " " << gzTau << std::endl;
         }
     }

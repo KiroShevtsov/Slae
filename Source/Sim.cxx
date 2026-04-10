@@ -1,5 +1,4 @@
 #include "Slae.hxx"
-#include <cmath>
 struct IterationArgs{
     SparseMatrix a_;
     Vector b_;
@@ -84,9 +83,8 @@ std::pair<Vector, double> SimpleIteration(const IterationArgs& args){
     delta = EuclidNorm(mtx * v - b);
     return {v, delta};
 }
-/*iter = 2^k, k - is std::size_t*/
 [[nodiscard]] std::pair<Vector, double> Tn(const SparseMatrix& mtx, const Vector& b,
-                                const Vector& xBegin, std::size_t iter, double tolerance) {
+                                const Vector& xBegin, std::size_t iter, std::pair<double, double> lambdas ,double tolerance) {
     std::size_t r = std::log(iter) / std::log(2.0);
     std::vector<std::size_t> idx = {0};
     for(std::size_t i = 0; i < r; ++i) {
@@ -107,7 +105,10 @@ std::pair<Vector, double> SimpleIteration(const IterationArgs& args){
 
     std::vector<double> tau(iter);
     for(std::size_t i = 0; i < iter; ++i) {
-        tau[i] = lambda(iter, idx[i] );
+        double ti = lambda(iter, idx[i] );
+        // tau[i] = 1  / ti;
+        double t_tilda = 0.5 * (lambdas.first + lambdas.second) + 0.5 * (lambdas.second - lambdas.first) * ti;
+        tau[i] = 1 / t_tilda;
     }
 
     Vector v = xBegin;

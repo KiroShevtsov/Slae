@@ -186,4 +186,4 @@ public:
 
 /*solve with Chebyshov acceleration*/
 [[nodiscard]] std::pair<Vector, double> Tn(const SparseMatrix& mtx, const Vector& b,
-                                        const Vector& xBegin, std::size_t iter, double tolerance);
+                                        const Vector& xBegin, std::size_t iter, std::pair<double, double> lambdas, double tolerance);

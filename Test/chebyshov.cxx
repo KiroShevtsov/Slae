@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 #include "../Source/Slae.hxx"
 #include <format>
-const double tolerance = 1e-4;
-const std::size_t iter = 32;
+constexpr double tolerance = 1e-4;
+const std::size_t iter = 128;
 
 using key = std::pair<std::size_t, std::size_t>;
 [[nodiscard]] inline SparseMatrix Unit(std::size_t size){
@@ -24,7 +24,7 @@ TEST(chebyshov, b_zero){
         xBeginVec[i] = std::log(i + 1) * std::sin(i) * std::exp(i);
     }
     Vector xBegin(xBeginVec);
-    auto pseudo_solve = Tn(unit, b, xBegin, iter, std::make_pair(1, 1), tolerance);
+    auto pseudo_solve = Chebyshov(unit, b, xBegin, iter, std::make_pair(1, 1), tolerance);
     std::cout << "absolute error: " << std::format("{:.10f}", pseudo_solve.second) << std::endl;
     std::cout << "required error: " << tolerance << std::endl;
     for(std::size_t i = 0; i < n; ++i){
@@ -34,7 +34,6 @@ TEST(chebyshov, b_zero){
 TEST(chebyshov, with_fixed_mtx){
     std::size_t n = 2;
     /*fixed tau for this matrix*/
-    double tau_sim = 0.2;
     std::map<key, double> mtxMap = {{{0,0}, 4}, {{0, 1}, 1}, {{1, 0}, 1}, {{1, 1}, 3}};
     SparseMatrix mtx(n, n, mtxMap);
     std::vector<double> bVec = {5, 4};;
@@ -51,7 +50,7 @@ TEST(chebyshov, with_fixed_mtx){
     double l_max = 0.5 * (7 + std::sqrt(5));
     double l_min = 0.5 * (7 - std::sqrt(5));
 
-    auto pseudo_solve = Tn(mtx, b, xBegin, iter, std::make_pair(l_min, l_max), tolerance);
+    auto pseudo_solve = Chebyshov(mtx, b, xBegin, iter, std::make_pair(l_min, l_max), tolerance);
     std::cout << "absolute error: " << std::format("{:.10f}", pseudo_solve.second) << std::endl;
     std::cout << "required error: " << tolerance << std::endl;
     for(std::size_t i = 0; i < n; ++i){
@@ -83,7 +82,7 @@ TEST(chebyshov, for_fixed_mtx){
     double l_min = 4 - std::sqrt(2);
     double l_max = 4 + std::sqrt(2);
 
-    auto pseudo_solve = Tn(mtx, b, xBegin, iter, std::make_pair(l_min, l_max), tolerance);
+    auto pseudo_solve = Chebyshov(mtx, b, xBegin, iter, std::make_pair(l_min, l_max), tolerance);
     std::cout << "absolute error: " << std::format("{:.10f}", pseudo_solve.second) << std::endl;
     std::cout << "required error: " << tolerance << std::endl;
     for(std::size_t i = 0; i < n; ++i){

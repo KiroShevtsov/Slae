@@ -33,7 +33,7 @@ TEST(chebyshov, b_zero){
 }
 TEST(chebyshov, with_fixed_mtx){
     std::size_t n = 2;
-    /*interesting :/*/
+    /*fixed tau for this matrix*/
     double tau_sim = 0.2;
     std::map<key, double> mtxMap = {{{0,0}, 4}, {{0, 1}, 1}, {{1, 0}, 1}, {{1, 1}, 3}};
     SparseMatrix mtx(n, n, mtxMap);

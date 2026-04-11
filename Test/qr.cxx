@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include "../Source/Slae.hxx"
 const double delta = 1e-5;
-std::size_t n = 4;
+const std::size_t n = 4;
 Matrix unit(std::size_t m){
     std::vector<double> u(m * m);
     for(std::size_t i = 0; i < m; ++i){

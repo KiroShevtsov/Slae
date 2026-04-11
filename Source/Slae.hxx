@@ -176,7 +176,7 @@ public:
 
 /*solve with sim method, sparse_mtx @ x = b with absolute error*/
 [[nodiscard]] std::pair<Vector, double> Solve(const SparseMatrix& mtx, const Vector& b,
-                                     const Vector& xBegin, std::size_t iter, double tau, double tol);
+                                     const Vector& xBegin, std::size_t iter, double tau, double tolerance);
 
 /*solve with jacobi method*/
 [[nodiscard]] std::pair<Vector, double> Jacobi(const SparseMatrix& mtx, const Vector& b, const Vector& vBegin, std::size_t iter);
@@ -184,6 +184,6 @@ public:
 /*gauss-zeidel method*/
 [[nodiscard]] std::pair<Vector, double> GaussZeidel(const SparseMatrix& mtx, const Vector& b, const Vector& vBegin, std::size_t iter);
 
-/*solve with Chebyshov acceleration*/
-[[nodiscard]] std::pair<Vector, double> Tn(const SparseMatrix& mtx, const Vector& b,
+/*solve with Chebyshov acceleration, iter = 2^N, N is natural num*/
+[[nodiscard]] std::pair<Vector, double> Chebyshov(const SparseMatrix& mtx, const Vector& b,
                                         const Vector& xBegin, std::size_t iter, std::pair<double, double> lambdas, double tolerance);

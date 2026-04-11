@@ -23,3 +23,4 @@ inline Vector CreateBeginX(std::size_t size){
     }
     return Vector(res);
 }
+int main() {return 0;}

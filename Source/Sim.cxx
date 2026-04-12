@@ -78,7 +78,7 @@ constexpr double singular = 1e-7;
             double absoluteDelta = error;
             return {v, absoluteDelta};
         }
-
+        
         for(std::size_t k = 0; k < mtx.ny_; ++k){
             double diagonalMtx = mtx(k, k);
             if(diagonalMtx == 0) {diagonalMtx += singular;}

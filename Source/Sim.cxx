@@ -36,13 +36,13 @@ constexpr double singular = 1e-7;
         /*vector on i-iter*/
         Vector vCurrent = v;
         /*current error*/
-        delta = (mtx * vCurrent - b).linalg_norm;
+        double error = (mtx * vCurrent - b).linalg_norm;
 
         /*callback*/
-        if(callback) { callback(i, delta); }
+        if(callback) { callback(i, error); }
 
-        if(delta < tolerance) {
-            double absoluteDelta = delta;
+        if(error < tolerance) {
+            double absoluteDelta = error;
             return {vCurrent, absoluteDelta};
         }
         for(std::size_t k = 0; k < mtx.ny_; ++k){
@@ -55,6 +55,7 @@ constexpr double singular = 1e-7;
             }
             vCurrent[k] = (1 / diagonalMtx) * (b[k] - lux);
         }
+        delta = error;
         v = vCurrent;
     }
     double absoluteDelta = delta;
@@ -68,13 +69,13 @@ constexpr double singular = 1e-7;
     
     for(std::size_t i = 0; i < iter; ++i){
         /*current error*/
-        delta = (mtx * v - b).linalg_norm;
+        double error = (mtx * v - b).linalg_norm;
 
         /*callback*/
-        if (callback) { callback(i, delta); };
+        if (callback) { callback(i, error); };
 
-        if(delta < tolerance) {
-            double absoluteDelta = delta;
+        if(error < tolerance) {
+            double absoluteDelta = error;
             return {v, absoluteDelta};
         }
 
@@ -87,6 +88,7 @@ constexpr double singular = 1e-7;
             } 
             v[k] = (1 / diagonalMtx) * (b[k] - p);
         }
+        delta = error;
     }
     double absoluteDelta = delta;
     return {v, absoluteDelta};

@@ -4,12 +4,19 @@
 #include <stdexcept>
 #include <cmath>
 #include <map>
+#include <functional>
 class Vector{
     std::vector<double> v_;
 public:
     std::size_t dim;
+    double linalg_norm;
     Vector(const std::vector<double>& v) : v_(v), dim(v.size()){
         if(v.empty()){throw std::invalid_argument("Vector is empty");}
+        double xx = 0;
+        for(std::size_t i = 0; i < v.size(); ++i) {
+            xx += v[i] * v[i];
+        }
+        linalg_norm = std::sqrt(xx);
     }
     const std::vector<double>& data() const {return v_;}
 
@@ -58,10 +65,10 @@ inline std::ostream& operator<<(std::ostream& os, const Vector& v){
     }
     return os;
 }
-inline double EuclidNorm(const Vector& v) {
-    if(v.dim == 0) {throw std::invalid_argument("vector empty");}
-    return std::sqrt(v * v);
-}
+// inline double EuclidNorm(const Vector& v) {
+//     if(v.dim == 0) {throw std::invalid_argument("vector empty");}
+//     return std::sqrt(v * v);
+// }
 double Vector::operator*(const Vector& o) const {
     if(v_.size() != o.v_.size()) {throw std::invalid_argument("Impossible to mult vectors");}
     double res = 0;
@@ -165,6 +172,8 @@ public:
         return {res};
     }
 };
+using L = std::function<void(std::size_t, double)>;
+
 /*Solve with sweep method*/
 [[nodiscard]] Vector Solve(const std::vector<double>& a, const std::vector<double>& b, const std::vector<double>& c, const Vector& d);
 
@@ -176,14 +185,16 @@ public:
 
 /*solve with sim method, sparse_mtx @ x = b with absolute error*/
 [[nodiscard]] std::pair<Vector, double> Solve(const SparseMatrix& mtx, const Vector& b,
-                                     const Vector& xBegin, std::size_t iter, double tau, double tolerance);
+                                     const Vector& xBegin, std::size_t iter, double tau, double tolerance, const L& callback = nullptr);
 
 /*solve with jacobi method*/
-[[nodiscard]] std::pair<Vector, double> Jacobi(const SparseMatrix& mtx, const Vector& b, const Vector& vBegin, std::size_t iter);
+[[nodiscard]] std::pair<Vector, double> Jacobi(const SparseMatrix& mtx, const Vector& b,
+                                            const Vector& vBegin, std::size_t iter, double tolerance, const L& callback = nullptr);
 
 /*gauss-zeidel method*/
-[[nodiscard]] std::pair<Vector, double> GaussZeidel(const SparseMatrix& mtx, const Vector& b, const Vector& vBegin, std::size_t iter);
+[[nodiscard]] std::pair<Vector, double> GaussZeidel(const SparseMatrix& mtx, const Vector& b, 
+                                        const Vector& vBegin, std::size_t iter, double tolerance, const L& callback = nullptr);
 
 /*solve with Chebyshov acceleration, iter = 2^N, N is natural num*/
-[[nodiscard]] std::pair<Vector, double> Chebyshov(const SparseMatrix& mtx, const Vector& b,
-                                        const Vector& xBegin, std::size_t iter, std::pair<double, double> lambdas, double tolerance);
+[[nodiscard]] std::pair<Vector, double> Chebyshov(const SparseMatrix& mtx, const Vector& b, const Vector& xBegin, 
+                    std::size_t iter, std::pair<double, double> lambdas, double tolerance, const L& callback = nullptr);

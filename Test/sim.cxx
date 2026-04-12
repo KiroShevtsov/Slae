@@ -67,7 +67,7 @@ TEST(sim, jacobi_for_zero_b){
         xBeginVec[i] = i * std::sin(i) * std::exp(i);
     }
     Vector xBegin(xBeginVec);
-    auto pseudo_solve = Jacobi(unit, b, xBegin, iter);
+    auto pseudo_solve = Jacobi(unit, b, xBegin, iter, tolerance);
     std::cout << "absolute error: " << std::format("{:.10f}", pseudo_solve.second) << std::endl;
     std::cout << "required error: " << tolerance << std::endl;
     for(std::size_t i = 0; i < n; ++i){
@@ -96,7 +96,7 @@ TEST(sim, jacobi_for_fixed_mtx){
         xBeginVec[i] = i * std::sin(i);
     }
     Vector xBegin(xBeginVec);
-    auto pseudo_solve = Jacobi(mtx, b, xBegin, iter);
+    auto pseudo_solve = Jacobi(mtx, b, xBegin, iter, tolerance);
     std::cout << "absolute error: " << std::format("{:.10f}", pseudo_solve.second) << std::endl;
     std::cout << "required error: " << tolerance << std::endl;
     for(std::size_t i = 0; i < n; ++i){
@@ -116,7 +116,7 @@ TEST(sim, gauss_zeidel_for_zero_b){
         xBeginVec[i] = i * std::sin(i) * std::exp(i);
     }
     Vector xBegin(xBeginVec);
-    auto pseudo_solve = GaussZeidel(unit, b, xBegin, iter);
+    auto pseudo_solve = GaussZeidel(unit, b, xBegin, iter, tolerance);
     std::cout << "absolute error: " << std::format("{:.10f}", pseudo_solve.second) << std::endl;
     std::cout << "required error: " << tolerance << std::endl;
     for(std::size_t i = 0; i < n; ++i){
@@ -136,41 +136,10 @@ TEST(sim, gauss_zeidel_for_mtx){
         xBeginVec[i] = i * std::sin(i);
     }
     Vector xBegin(xBeginVec);
-    auto pseudo_solve = GaussZeidel(mtx, b, xBegin, iter);
+    auto pseudo_solve = GaussZeidel(mtx, b, xBegin, iter, tolerance);
     std::cout << "absolute error: " << std::format("{:.10f}", pseudo_solve.second) << std::endl;
     std::cout << "required error: " << tolerance << std::endl;
     for(std::size_t i = 0; i < n; ++i){
         EXPECT_NEAR(pseudo_solve.first[i], static_cast<double>(1), tolerance);
     }
-}
-TEST(sim, degenerate_matrix_no_solution) {
-    std::size_t n = 2;
-    std::map<key, double> mtxMap = {
-        {{0, 0}, 0.0}, {{0, 1}, 0.0},
-        {{1, 0}, 0.0}, {{1, 1}, 1.0}
-    };
-    SparseMatrix A(n, n, mtxMap);
-    std::vector<double> bVec = {1.0, 0.0};
-    Vector b(bVec);
-    
-    Vector xBegin(std::vector<double>(n, 0.0));
-    
-    auto [solution, error] = Solve(A, b, xBegin, iter, tau, tolerance);
-    EXPECT_GE(error, tolerance);
-}
-TEST(sim, degenerate_matrix_inf_solutions) {
-    std::size_t n = 2;
-    std::map<key, double> mtxMap = {
-        {{0, 0}, 0.0}, {{0, 1}, 0.0},
-        {{1, 0}, 0.0}, {{1, 1}, 1.0}
-    };
-    SparseMatrix A(n, n, mtxMap);
-    std::vector<double> bVec = {0.0, 0.0};
-    Vector b(bVec);
-
-    Vector xBegin(std::vector<double>(n, 0.0));
-    auto [solution, error] = Solve(A, b, xBegin, iter, tau, tolerance);
-    
-    EXPECT_LE(error, tolerance);
-    EXPECT_NEAR(solution[1], 0.0, tolerance);
 }

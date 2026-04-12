@@ -51,7 +51,14 @@ public:
         }
         return res;
     }
-    inline double operator*(const Vector& o) const;
+    double operator*(const Vector& o) const {
+        if(v_.size() != o.v_.size()) {throw std::invalid_argument("Impossible to mult vectors");}
+        double res = 0;
+        for(std::size_t i = 0; i < v_.size(); ++i){
+            res += v_[i] * o.v_[i];
+        }
+        return res;
+    }
 
     double& operator[](std::size_t i) {return v_[i];}
 
@@ -64,18 +71,6 @@ inline std::ostream& operator<<(std::ostream& os, const Vector& v){
         os << item << whitesp;
     }
     return os;
-}
-// inline double EuclidNorm(const Vector& v) {
-//     if(v.dim == 0) {throw std::invalid_argument("vector empty");}
-//     return std::sqrt(v * v);
-// }
-double Vector::operator*(const Vector& o) const {
-    if(v_.size() != o.v_.size()) {throw std::invalid_argument("Impossible to mult vectors");}
-    double res = 0;
-    for(std::size_t i = 0; i < v_.size(); ++i){
-        res += v_[i] * o.v_[i];
-    }
-    return res;
 }
 /*nx - num of columns, ny - rows*/
 class Matrix{

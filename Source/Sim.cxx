@@ -1,18 +1,22 @@
 #include "Slae.hxx"
 /*sim for sparse matrix: v = v - tau (a @ v - b)*/
-[[nodiscard]] std::pair<Vector, double> Solve(const SparseMatrix& mtx, const Vector& b, 
-                                        const Vector& xBegin, std::size_t iter, double tau, double tolerance){
+[[nodiscard]] std::pair<Vector, double> Solve(const SparseMatrix& mtx, const Vector& b, const Vector& xBegin, 
+                                    std::size_t iter, double tau, double tolerance, const L& callback){
     if(mtx.nx_ != mtx.ny_) {throw std::invalid_argument("matrix is not square");}
     Vector v = xBegin;
-    double delta = EuclidNorm(mtx * v - b);
+    double delta = 0;
     for(std::size_t l = 0; l < iter; ++l){
         Vector vCurrent = v - (mtx * v - b) * tau;
         /*current r = Ax - b*/
-        double error = EuclidNorm(mtx * vCurrent - b);
+        double error = (mtx * vCurrent - b).linalg_norm;
+        /*callback*/
+        if(callback) { callback(l, error); }
+        
         if(error < tolerance){
             double absoluteDelta = error;
             return {vCurrent, absoluteDelta};
         }
+
         delta = error;
         v = vCurrent;
     }
@@ -20,8 +24,10 @@
     return {v, absoluteDelta};
 }
 /*resolve zeros on diagonal elements*/
-constexpr double singular = 1e-4;
-[[nodiscard]] std::pair<Vector, double> Jacobi(const SparseMatrix& mtx, const Vector& b, const Vector& vBegin, std::size_t iter){
+constexpr double singular = 1e-7;
+
+[[nodiscard]] std::pair<Vector, double> Jacobi(const SparseMatrix& mtx, const Vector& b, 
+                                const Vector& vBegin, std::size_t iter, double tolerance, const L& callback){
     if (mtx.nx_ != mtx.ny_) {throw std::invalid_argument("matrix is not square");}
     Vector v = vBegin;
     double delta = 0;
@@ -29,46 +35,64 @@ constexpr double singular = 1e-4;
     for(std::size_t i = 0; i < iter; ++i){
         /*vector on i-iter*/
         Vector vCurrent = v;
+        /*current error*/
+        delta = (mtx * vCurrent - b).linalg_norm;
+
+        /*callback*/
+        if(callback) { callback(i, delta); }
+
+        if(delta < tolerance) {
+            double absoluteDelta = delta;
+            return {vCurrent, absoluteDelta};
+        }
         for(std::size_t k = 0; k < mtx.ny_; ++k){
             double diagonalMtx = mtx(k, k);
             if(diagonalMtx == 0) {diagonalMtx += singular;}
             /*(l + u) @ x*/
             double lux = 0;
             for(std::size_t j = 0; j < mtx.nx_; ++j) {
-                if (j != k) {lux += mtx(k, j) * vCurrent[j];}
+                if (j != k) {lux += mtx(k, j) * v[j];}
             }
             vCurrent[k] = (1 / diagonalMtx) * (b[k] - lux);
         }
         v = vCurrent;
     }
-    delta = EuclidNorm(mtx * v - b);
-    return {v, delta};
+    double absoluteDelta = delta;
+    return {v, absoluteDelta};
 }
-[[nodiscard]] std::pair<Vector, double> GaussZeidel(const SparseMatrix& mtx, const Vector& b, const Vector& vBegin, std::size_t iter){
+[[nodiscard]] std::pair<Vector, double> GaussZeidel(const SparseMatrix& mtx, const Vector& b, 
+                                const Vector& vBegin, std::size_t iter, double tolerance, const L& callback){
     if (mtx.ny_ != mtx.nx_) {throw std::invalid_argument("matrix is not square");}
     Vector v = vBegin;
     double delta = 0;
     
     for(std::size_t i = 0; i < iter; ++i){
-        Vector vCurrent = v;
+        /*current error*/
+        delta = (mtx * v - b).linalg_norm;
+
+        /*callback*/
+        if (callback) { callback(i, delta); };
+
+        if(delta < tolerance) {
+            double absoluteDelta = delta;
+            return {v, absoluteDelta};
+        }
+
         for(std::size_t k = 0; k < mtx.ny_; ++k){
             double diagonalMtx = mtx(k, k);
             if(diagonalMtx == 0) {diagonalMtx += singular;}
-            double p = 0, q = 0;
-            for (std::size_t j = k + 1; j < mtx.nx_; ++j) {
-                q += mtx(k, j) * vCurrent[j];
-            }
-            for(std::size_t j = 0; j < k; ++j) {
-                p += mtx(k, j) * v[j];
+            double p = 0;
+            for (std::size_t j = 0; j < mtx.nx_; ++j) {
+                if (j != k) p += mtx(k, j) * v[j];
             } 
-            v[k] = (1 / diagonalMtx) * (b[k] - p - q);
+            v[k] = (1 / diagonalMtx) * (b[k] - p);
         }
     }
-    delta = EuclidNorm(mtx * v - b);
-    return {v, delta};
+    double absoluteDelta = delta;
+    return {v, absoluteDelta};
 }
-[[nodiscard]] std::pair<Vector, double> Chebyshov(const SparseMatrix& mtx, const Vector& b,
-                                const Vector& xBegin, std::size_t iter, std::pair<double, double> lambdas, double tolerance) {
+[[nodiscard]] std::pair<Vector, double> Chebyshov(const SparseMatrix& mtx, const Vector& b, const Vector& xBegin, 
+                    std::size_t iter, std::pair<double, double> lambdas, double tolerance, const L& callback) {
     std::size_t w = iter;
     std::size_t r = 0; while (w >>= 1) {++r;};
     std::vector<std::size_t> idx = {0};
@@ -83,6 +107,7 @@ constexpr double singular = 1e-4;
         }
         idx = c;
     }
+    
     /*create Chebyshov polynomial roots*/
     auto lambda = [&] (std::size_t n, std::size_t s) -> double {
         double arg = std::numbers::pi_v<double> * (2 * s + 1) / (2 * n);
@@ -97,11 +122,14 @@ constexpr double singular = 1e-4;
     }
 
     Vector v = xBegin;
-    double delta = EuclidNorm(mtx * v - b);
+    double delta = 0;
     for(std::size_t l = 0; l < iter; ++l){
         Vector vCurrent = v - (mtx * v - b) * tau[l];
         /*current r = Ax - b*/
-        double error = EuclidNorm(mtx * vCurrent - b);
+        double error = (mtx * vCurrent - b).linalg_norm;
+        /*callback*/
+        if(callback) { callback(l, error); }
+
         if(error < tolerance){
             double absoluteDelta = error;
             return {vCurrent, absoluteDelta};

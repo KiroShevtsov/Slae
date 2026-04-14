@@ -61,8 +61,8 @@ constexpr double singular = 1e-7;
     double absoluteDelta = delta;
     return {v, absoluteDelta};
 }
-[[nodiscard]] std::pair<Vector, double> GaussZeidel(const SparseMatrix& mtx, const Vector& b, 
-                                const Vector& vBegin, std::size_t iter, double tolerance, const std::function<void(std::size_t, double)>& callback){
+[[nodiscard]] std::pair<Vector, double> GaussZeidel(const SparseMatrix& mtx, const Vector& b, const Vector& vBegin,
+                                std::size_t iter, double tolerance, const std::function<void(std::size_t, double)>& callback){
     if (mtx.ny_ != mtx.nx_) {throw std::invalid_argument("matrix is not square");}
     Vector v = vBegin;
     double delta = 0;
@@ -93,8 +93,8 @@ constexpr double singular = 1e-7;
     double absoluteDelta = delta;
     return {v, absoluteDelta};
 }
-[[nodiscard]] std::pair<Vector, double> Chebyshov(const SparseMatrix& mtx, const Vector& b, const Vector& xBegin, 
-                    std::size_t iter, std::pair<double, double> lambdas, double tolerance, const std::function<void(std::size_t, double)>& callback) {
+[[nodiscard]] std::pair<Vector, double> Chebyshov(const SparseMatrix& mtx, const Vector& b, const Vector& xBegin, std::size_t iter,
+                         std::pair<double, double> lambdas, double tolerance, const std::function<void(std::size_t, double)>& callback) {
     std::size_t w = iter;
     std::size_t r = 0; while (w >>= 1) {++r;};
     std::vector<std::size_t> idx = {0};

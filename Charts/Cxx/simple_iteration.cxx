@@ -32,7 +32,7 @@ int main() {
         };
     };
     
-    auto l1 = Solve(mtx, b, x0, iter, tau, tolerance, logger("sim"));
+    auto l1 = SimpleIteration(mtx, b, x0, iter, tau, tolerance, logger("sim"));
     auto l2 = Chebyshov(mtx, b, x0, iter, {0.10, 20.09}, tolerance, logger("chebyshov"));
     auto l3 = GaussZeidel(mtx, b, x0, iter, tolerance, logger("gauss-zeidel"));
     auto l4 = Jacobi(mtx, b, x0, iter, tolerance, logger("jacobi"));
@@ -42,7 +42,7 @@ int main() {
     Vector s = x0;
     for (int i = 0; i <= iter; i++) {
         auto start = std::chrono::steady_clock::now();
-        auto [v, e] = Solve(mtx, b, s, iter, tau, tolerance);
+        auto [v, e] = SimpleIteration(mtx, b, s, iter, tau, tolerance);
         auto end = std::chrono::steady_clock::now();
         s = v;
         t_sim += std::chrono::duration<double>(end - start).count();

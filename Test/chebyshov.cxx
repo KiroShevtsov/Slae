@@ -5,16 +5,16 @@ constexpr double tolerance = 1e-4;
 const std::size_t iter = 128;
 
 using key = std::pair<std::size_t, std::size_t>;
-[[nodiscard]] inline SparseMatrix Unit(std::size_t size){
+[[nodiscard]] inline Sparse Unit(std::size_t size){
     std::map<key, double> e;
     for(std::size_t i = 0; i < size; ++i){
         e[std::make_pair(i, i)] = static_cast<double>(1);
     }
-    return SparseMatrix(size, size, e);
+    return Sparse(size, size, e);
 }
 TEST(chebyshov, b_zero){
     std::size_t n = 5;
-    SparseMatrix unit = Unit(n);
+    Sparse unit = Unit(n);
     std::vector<double> bVec(n);
     Vector b(bVec);
 
@@ -35,7 +35,7 @@ TEST(chebyshov, with_fixed_mtx){
     std::size_t n = 2;
     /*fixed tau for this matrix*/
     std::map<key, double> mtxMap = {{{0,0}, 4}, {{0, 1}, 1}, {{1, 0}, 1}, {{1, 1}, 3}};
-    SparseMatrix mtx(n, n, mtxMap);
+    Sparse mtx(n, n, mtxMap);
     std::vector<double> bVec = {5, 4};;
     Vector b(bVec);
 
@@ -69,7 +69,7 @@ TEST(chebyshov, for_fixed_mtx){
             mtxMap[std::make_pair(i, i + 1)] = static_cast<double>(1);
         }
     }
-    SparseMatrix mtx(n, n, mtxMap);
+    Sparse mtx(n, n, mtxMap);
     std::vector<double> bVec = {5, 6, 5};
     Vector b(bVec);
 

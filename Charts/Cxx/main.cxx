@@ -65,7 +65,7 @@ int main(){
                     }
                 }
             }
-            SparseMatrix second(nx, ny, m);
+            Sparse second(nx, ny, m);
             
             double t_dense = IterationTime([&](){Vector r = first * ksi;}, density.size());
             double t_sparse = IterationTime([&](){Vector r = second * ksi;}, density.size());

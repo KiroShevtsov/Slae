@@ -115,7 +115,7 @@ inline std::ostream& operator<<(std::ostream& os, const Matrix& matrix){
     }
     return os;
 }
-class SparseMatrix{
+class Sparse{
     using S = std::map<std::pair<std::size_t, std::size_t>, double>;
     std::vector<double> values_;
     std::vector<std::size_t> cols_, rows_;
@@ -123,7 +123,7 @@ public:
     const std::size_t nx_;
     const std::size_t ny_;
     
-    SparseMatrix(std::size_t nx, std::size_t ny, const S& mtx) : nx_(nx), ny_(ny){
+    Sparse(std::size_t nx, std::size_t ny, const S& mtx) : nx_(nx), ny_(ny){
         /*rows(0) = 0*/
         rows_.push_back(0);
         std::size_t non_zero = 0;
@@ -178,21 +178,26 @@ public:
 [[nodiscard]] Vector Solve(const Matrix& mtx, const Vector& b);
 
 /*solve with sim method, sparse_mtx @ x = b with absolute error*/
-[[nodiscard]] std::pair<Vector, double> Solve(const SparseMatrix& mtx, const Vector& b,
+[[nodiscard]] std::pair<Vector, double> SimpleIteration(const Sparse& mtx, const Vector& b,
                                      const Vector& xBegin, std::size_t iter, double tau, double tolerance, 
-                                        const std::function<void(std::size_t, double)>& callback = nullptr);
+                                        const std::function<void(std::size_t, double)>& c = nullptr);
 
 /*solve with jacobi method*/
-[[nodiscard]] std::pair<Vector, double> Jacobi(const SparseMatrix& mtx, const Vector& b,
+[[nodiscard]] std::pair<Vector, double> Jacobi(const Sparse& mtx, const Vector& b,
                                             const Vector& vBegin, std::size_t iter, double tolerance, 
-                                                const std::function<void(std::size_t, double)>& callback = nullptr);
+                                                const std::function<void(std::size_t, double)>& c = nullptr);
 
 /*gauss-zeidel method*/
-[[nodiscard]] std::pair<Vector, double> GaussZeidel(const SparseMatrix& mtx, const Vector& b, 
+[[nodiscard]] std::pair<Vector, double> GaussZeidel(const Sparse& mtx, const Vector& b, 
                                         const Vector& vBegin, std::size_t iter, double tolerance,
-                                             const std::function<void(std::size_t, double)>& callback = nullptr);
+                                             const std::function<void(std::size_t, double)>& c = nullptr);
 
 /*solve with Chebyshov acceleration, iter = 2^N, N is natural num*/
-[[nodiscard]] std::pair<Vector, double> Chebyshov(const SparseMatrix& mtx, const Vector& b, const Vector& xBegin, 
-                    std::size_t iter, std::pair<double, double> lambdas, double tolerance, 
-                        const std::function<void(std::size_t, double)>& callback = nullptr);
+[[nodiscard]] std::pair<Vector, double> Chebyshov(const Sparse& mtx, const Vector& b, const Vector& xBegin, 
+                    std::size_t iter, const std::pair<double, double>& lambdas, double tolerance, 
+                        const std::function<void(std::size_t, double)>& c = nullptr);
+namespace Symmetric{
+    /*symmetric gauss zeidel for sle*/
+    std::pair<Vector, double> GaussZeidel_S(const Sparse& mtx, const Vector& xBegin, std::size_t iter,
+        const std::pair<double, double>& lambdas, const std::function<void(std::size_t, double)>& c = nullptr);
+}

@@ -148,4 +148,5 @@ std::pair<Vector, double> Symmetric::GaussZeidel_S(const Sparse& mtx, const Vect
     auto [lMin, lMax] = lambdas;
     const double rho = std::abs(lMax - lMin);
     for(std::size_t i = 0; i < iter; ++i) {}
+    return {v, lMin};
 }

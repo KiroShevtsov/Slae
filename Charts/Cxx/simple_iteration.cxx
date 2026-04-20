@@ -3,14 +3,14 @@
 #include <fstream>
 #include <iostream>
 using key = std::pair<std::size_t, std::size_t>;
-inline SparseMatrix CreateSparse(std::size_t nx){
+inline Sparse CreateSparse(std::size_t nx){
     std::map<key, double> m;
     for(std::size_t i = 0; i < nx; ++i) {
         m[std::make_pair(i,i)] = 10.1;
         if(i > 0) m[std::pair(i, i - 1)] = -5.0;
         if(i < nx - 1) m[std::pair(i, i + 1)] = -5.0;
     }
-    SparseMatrix mtx(nx, nx, m);
+    Sparse mtx(nx, nx, m);
     return mtx;
 }
 constexpr std::size_t iter = 128;
@@ -22,7 +22,7 @@ int main() {
     std::ofstream plot("errors.txt");
     std::ofstream times("times.txt");
     
-    SparseMatrix mtx = CreateSparse(size);
+    Sparse mtx = CreateSparse(size);
     Vector b = Vector(std::vector<double>(size, 10.0));
     Vector x0(std::vector<double>(size, 100));
 

@@ -198,6 +198,6 @@ public:
                         const std::function<void(std::size_t, double)>& c = nullptr);
 namespace Symmetric{
     /*symmetric gauss zeidel for sle*/
-    std::pair<Vector, double> GaussZeidel_S(const Sparse& mtx, const Vector& xBegin, std::size_t iter,
-        const std::pair<double, double>& lambdas, const std::function<void(std::size_t, double)>& c = nullptr);
+    std::pair<Vector, double> GaussZeidel_S(const Sparse& mtx, const Vector& b, const Vector& xBegin, std::size_t iter,
+        double rho, const double& tolerance, const std::function<void(std::size_t, double)>& c = nullptr);
 }

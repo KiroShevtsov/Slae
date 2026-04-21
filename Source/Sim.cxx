@@ -1,5 +1,5 @@
 #include "Slae.hxx"
-#include <memory>
+#include <utility>
 /*sim for sparse matrix: v = v - tau (a @ v - b)*/
 [[nodiscard]] std::pair<Vector, double> SimpleIteration(const Sparse& mtx, const Vector& b, 
                     const Vector& xBegin, std::size_t iter, double tau, double tolerance, 
@@ -141,12 +141,68 @@ constexpr double singular = 1e-7;
     double absoluteDelta = delta;
     return {v, absoluteDelta};
 }
-std::pair<Vector, double> Symmetric::GaussZeidel_S(const Sparse& mtx, const Vector& vBegin, 
-                std::size_t iter, const std::pair<double, double>& lambdas, 
+std::pair<Vector, double> Symmetric::GaussZeidel_S(const Sparse& mtx, const Vector& b, const Vector& vBegin, 
+                std::size_t iter, double rho, const double& tolerance,
                     const std::function<void(std::size_t, double)>& c) {
     Vector v = vBegin;
-    auto [lMin, lMax] = lambdas;
-    const double rho = std::abs(lMax - lMin);
-    for(std::size_t i = 0; i < iter; ++i) {}
-    return {v, lMin};
+    double delta = (mtx * vBegin - b).linalg_norm;
+
+    auto fx = [&mtx, &b, &vBegin](const Vector& x) -> Vector {
+        Vector u = x;
+        std::size_t s = mtx.nx_;
+        for(std::size_t i = 0; i < s; ++i) {
+            double current = 0;
+            for(std::size_t l = 0; l < i; ++l) {
+                current += mtx(i, l) * u[l];
+            }
+            for(std::size_t l = i + 1; l < s; ++l) {
+                current += mtx(i, l) * x[l];
+            }
+            double diagonalMtx = mtx(i, i);
+            if (diagonalMtx == 0) {diagonalMtx += singular;}
+            u[i] = (b[i] - current) / (diagonalMtx);
+        }
+        Vector res = u;
+        for(long long i = static_cast<long long>(s) - 1; i >= 0; --i) {
+            double current = 0;
+            for(std::size_t j = 0; j < static_cast<std::size_t>(i); ++j) {
+                current += mtx(i, j) * u[j];
+            }
+            for(std::size_t j = static_cast<std::size_t>(i) + 1; j < s; ++j) {
+                current += mtx(i, j) * res[j];
+            }
+            double diagonalMtx = mtx(i, i);
+            if(diagonalMtx == 0) {diagonalMtx += singular;}
+            res[i] = (b[i] - current) / (diagonalMtx);
+        }
+        return res;
+    };
+    
+    Vector yBegin = vBegin;
+    /*first iteration symmetric Gauss-Zeidel*/
+    Vector res = fx(yBegin);
+    double w = 1;
+    double wNext = 2 / (2 - rho * rho);
+
+    for(std::size_t i = 2; i < iter + 1; ++i) {
+        Vector z = fx(res);
+        Vector current = (z - yBegin) * wNext + yBegin;
+        yBegin = std::exchange(res, current);
+        /*w[i]*/
+        w = wNext;
+        /*w[i + 1]*/
+        wNext = 1 / (1 - 0.25 * (w * rho * rho));
+        double error = (mtx * res - b).linalg_norm;
+
+        /*callback*/
+        if (c) {c(i, error);}
+
+        if (error < tolerance) {
+            double absoluteDelta = error;
+            return {res, absoluteDelta};
+        }
+        delta = error;
+    }
+    double absoluteDelta = delta;
+    return {res, absoluteDelta};
 }

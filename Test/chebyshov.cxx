@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include "../Source/Slae.hxx"
 #include <format>
-constexpr double tolerance = 1e-4;
+constexpr double tolerance = 1e-10;
 const std::size_t iter = 128;
 
 using key = std::pair<std::size_t, std::size_t>;

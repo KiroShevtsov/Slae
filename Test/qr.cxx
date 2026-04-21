@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include "../Source/Slae.hxx"
-const double delta = 1e-5;
+const double delta = 1e-10;
 const std::size_t n = 4;
 Matrix unit(std::size_t m){
     std::vector<double> u(m * m);
@@ -61,7 +61,6 @@ TEST(qr_task, qr_sle_examples){
     
     ASSERT_EQ(x.dim, res.dim);
     for(std::size_t i = 0; i < d.dim; ++i){
-        // EXPECT_NEAR(x[i], res[i], delta);
         EXPECT_NEAR(x[i], res[i], tol);
     }
 }

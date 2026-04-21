@@ -17,8 +17,11 @@ constexpr std::size_t iter = 128;
 constexpr std::size_t size = 100;
 constexpr double tolerance = 1e-11;
 constexpr double tau = 0.09;
-
+/*for symmetric qz*/
+constexpr double rho = 0.9;
+constexpr std::pair<double, double> lambdas = {0.105, 20.09};
 int main() {
+    auto [lMin, lMax] = lambdas;
     std::ofstream plot("errors.txt");
     std::ofstream times("times.txt");
     
@@ -36,13 +39,14 @@ int main() {
     auto l2 = Chebyshov(mtx, b, x0, iter, {0.10, 20.09}, tolerance, logger("chebyshov"));
     auto l3 = GaussZeidel(mtx, b, x0, iter, tolerance, logger("gauss-zeidel"));
     auto l4 = Jacobi(mtx, b, x0, iter, tolerance, logger("jacobi"));
+    auto l5 = Symmetric::GaussZeidel_S(mtx, b, x0, iter, rho, tolerance, logger("symmetric_gz"));
 
-    double t_sim = 0, t_gz = 0, t_jacobi = 0, t_ch = 0;
+    double t_sim = 0, t_gz = 0, t_jacobi = 0, t_ch = 0, t_symmetric = 0;
 
     Vector s = x0;
-    for (int i = 0; i <= iter; i++) {
+    for (int i = 1; i <= iter; i++) {
         auto start = std::chrono::steady_clock::now();
-        auto [v, e] = SimpleIteration(mtx, b, s, iter, tau, tolerance);
+        auto [v, e] = SimpleIteration(mtx, b, s, i, tau, tolerance);
         auto end = std::chrono::steady_clock::now();
         s = v;
         t_sim += std::chrono::duration<double>(end - start).count();
@@ -50,9 +54,9 @@ int main() {
     }
     
     Vector g_z = x0;
-    for (int i = 0; i <= iter; i++) {
+    for (int i = 1; i <= iter; i++) {
         auto start = std::chrono::steady_clock::now();
-        auto [v, e] = GaussZeidel(mtx, b, g_z, iter, tolerance);
+        auto [v, e] = GaussZeidel(mtx, b, g_z, i, tolerance);
         auto end = std::chrono::steady_clock::now();
         g_z = v;
         t_gz += std::chrono::duration<double>(end - start).count();
@@ -60,9 +64,9 @@ int main() {
     }
     
     Vector j = x0;
-    for (int i = 0; i < iter; i++) {
+    for (int i = 1; i <= iter; i++) {
         auto start = std::chrono::steady_clock::now();
-        auto [v, e] = Jacobi(mtx, b, j, iter, tolerance);
+        auto [v, e] = Jacobi(mtx, b, j, i, tolerance);
         auto end = std::chrono::steady_clock::now();
         j = v;
         t_jacobi += std::chrono::duration<double>(end - start).count();
@@ -70,13 +74,23 @@ int main() {
     }
 
     Vector ch = x0;
-    for(int i = 0; i < iter; ++i) {
+    for(int i = 1; i <= iter; ++i) {
         auto start = std::chrono::steady_clock::now();
-        auto [v, e] = Chebyshov(mtx, b, ch, iter, {0.10, 20.09}, tolerance);
+        auto [v, e] = Chebyshov(mtx, b, ch, i, lambdas, tolerance);
         auto end = std::chrono::steady_clock::now();
         ch = v;
         t_ch += std::chrono::duration<double>(end - start).count();
         times << "chebyshov" << " " << t_ch << " " << e << "\n";
+    }
+
+    Vector symmetric_gz = x0;
+    for(int i = 1; i <= iter; ++i) {
+        auto start = std::chrono::steady_clock::now();
+        auto [v, e] = Symmetric::GaussZeidel_S(mtx, b, symmetric_gz, i, rho, tolerance);
+        auto end = std::chrono::steady_clock::now();
+        symmetric_gz = v;
+        t_symmetric += std::chrono::duration<double>(end - start).count();
+        times << "sym_gz" << " " << t_symmetric << " " << e << "\n";
     }
     return 0;
 }

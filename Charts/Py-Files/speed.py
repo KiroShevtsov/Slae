@@ -7,8 +7,10 @@ with open("build/data.txt", "r") as file:
     for line in file:
         s = line.split(" ")
         alpha.append(float(s[0]))
-        t_dense.append(float(s[1]) * 1e6)
-        t_sparse.append(float(s[2]) * 1e6)
+        t_dense.append(float(s[1]))
+        t_sparse.append(float(s[2]))
+t_dense = np.array(t_dense) * 1e6
+t_sparse = np.array(t_sparse) * 1e6
 x = np.array(alpha)
 list = [t_dense, t_sparse]
 labels = ['Dense Matrix', 'Sparse Matrix']

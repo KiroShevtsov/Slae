@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-nx = 100
+nx = 1000
 mtx = np.eye(nx) * 10.1 + np.eye(nx, k=-1) * -5 + np.eye(nx, k=1) * -5
 eigenvalues = np.linalg.eigvals(mtx)
 
@@ -28,5 +28,5 @@ ax2.set_ylabel('error, log')
 ax2.set_title('сравнение методов по времени, n = 100 (размер)')
 ax2.grid(True)
 ax2.legend()
-plt.savefig("sim.png")
+plt.savefig("ssor.png")
 plt.show()

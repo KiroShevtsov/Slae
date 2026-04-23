@@ -26,11 +26,11 @@ target_link_libraries(sim_methods PRIVATE slae_lib)
 enable_testing()
 find_package(GTest REQUIRED)
 add_executable(slae_test 
-    Test/operations.cxx
-    # Test/sweep_method.cxx
+    # Test/operations.cxx
+    Test/sweep_method.cxx
     # Test/qr.cxx
-    # Test/sim.cxx
-    # Test/chebyshov.cxx
+    Test/sim.cxx
+    Test/chebyshov.cxx
     Test/ssor.cxx
 )
 target_link_libraries(slae_test PRIVATE slae_lib GTest::gtest_main)

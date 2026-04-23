@@ -1,7 +1,5 @@
 #include <gtest/gtest.h>
 #include "../Source/Slae.hxx"
-#include <format>
-constexpr double tau = 0.2;
 /*required tolerance*/
 constexpr double tolerance = 1e-10;
 constexpr std::size_t iter = 100;
@@ -25,16 +23,17 @@ TEST(sim, b_zero){
         xBeginVec[i] = std::log(i + 1) * std::sin(i) * std::exp(i);
     }
     Vector xBegin(xBeginVec);
-    auto [simSolve, error] = SimpleIteration(unit, b, xBegin, iter, tau, tolerance);
-    std::cout << "absolute error: " << std::format("{:.10f}", error) << std::endl;
-    std::cout << "required error: " << tolerance << std::endl;
+    const double tau_opt = 1;
+    auto [simSolve, error] = SimpleIteration(unit, b, xBegin, iter, tau_opt, tolerance);
+
     for(std::size_t i = 0; i < n; ++i){
         EXPECT_NEAR(simSolve[i], static_cast<double>(0), tolerance);
     }
+    EXPECT_LE(error, tolerance);
 }
 TEST(sim, sim_with_fixed_mtx){
     std::size_t n = 2;
-    double tau_sim = 0.2;
+    double tau_opt = 0.286;
     std::map<key, double> mtxMap = {{{0,0}, 4}, {{0, 1}, 1}, {{1, 0}, 1}, {{1, 1}, 3}};
     Sparse mtx(n, n, mtxMap);
     std::vector<double> bVec = {5, 4};;
@@ -46,12 +45,12 @@ TEST(sim, sim_with_fixed_mtx){
         xBeginVec[i] = std::log(i + 1) * std::sin(i);
     }
     Vector xBegin(xBeginVec);
-    auto [simSolve, error] = SimpleIteration(mtx, b, xBegin, iter, tau_sim, tolerance);
-    std::cout << "absolute error: " << std::format("{:.10f}", error) << std::endl;
-    std::cout << "required error: " << tolerance << std::endl;
+    auto [simSolve, error] = SimpleIteration(mtx, b, xBegin, iter, tau_opt, tolerance);
+
     for(std::size_t i = 0; i < n; ++i){
         EXPECT_NEAR(simSolve[i], static_cast<double>(1), tolerance);
     }
+    EXPECT_LE(error, tolerance);
 }
 TEST(sim, jacobi_for_zero_b){
     std::size_t n = 5;
@@ -67,11 +66,11 @@ TEST(sim, jacobi_for_zero_b){
     }
     Vector xBegin(xBeginVec);
     auto [jacobiSolve, error] = Jacobi(unit, b, xBegin, iter, tolerance);
-    std::cout << "absolute error: " << std::format("{:.10f}", error) << std::endl;
-    std::cout << "required error: " << tolerance << std::endl;
+
     for(std::size_t i = 0; i < n; ++i){
         EXPECT_NEAR(jacobiSolve[i], static_cast<double>(0), tolerance);
     }
+    EXPECT_LE(error, tolerance);
 }
 TEST(sim, jacobi_for_fixed_mtx){
     std::size_t n = 3;
@@ -96,11 +95,11 @@ TEST(sim, jacobi_for_fixed_mtx){
     }
     Vector xBegin(xBeginVec);
     auto [jacobiSolve, error] = Jacobi(mtx, b, xBegin, iter, tolerance);
-    std::cout << "absolute error: " << std::format("{:.10f}", error) << std::endl;
-    std::cout << "required error: " << tolerance << std::endl;
+
     for(std::size_t i = 0; i < n; ++i){
         EXPECT_NEAR(jacobiSolve[i], static_cast<double>(1), tolerance);
     }
+    EXPECT_LE(error, tolerance);
 }
 TEST(sim, gauss_zeidel_for_zero_b){
     std::size_t n = 5;
@@ -116,11 +115,11 @@ TEST(sim, gauss_zeidel_for_zero_b){
     }
     Vector xBegin(xBeginVec);
     auto [solve, error] = GaussZeidel(unit, b, xBegin, iter, tolerance);
-    std::cout << "absolute error: " << std::format("{:.10f}", error) << std::endl;
-    std::cout << "required error: " << tolerance << std::endl;
+
     for(std::size_t i = 0; i < n; ++i){
         EXPECT_NEAR(solve[i], static_cast<double>(0), tolerance);
     }
+    EXPECT_LE(error, tolerance);
 }
 TEST(sim, gauss_zeidel_for_mtx){
     std::size_t n = 2;
@@ -136,9 +135,9 @@ TEST(sim, gauss_zeidel_for_mtx){
     }
     Vector xBegin(xBeginVec);
     auto [solve, error] = GaussZeidel(mtx, b, xBegin, iter, tolerance);
-    std::cout << "absolute error: " << std::format("{:.10f}", error) << std::endl;
-    std::cout << "required error: " << tolerance << std::endl;
+
     for(std::size_t i = 0; i < n; ++i){
         EXPECT_NEAR(solve[i], static_cast<double>(1), tolerance);
     }
+    EXPECT_LE(error, tolerance);
 }

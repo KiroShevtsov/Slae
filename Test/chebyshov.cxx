@@ -2,7 +2,7 @@
 #include "../Source/Slae.hxx"
 #include <format>
 constexpr double tolerance = 1e-10;
-const std::size_t iter = 128;
+constexpr std::size_t iter = 128;
 
 using key = std::pair<std::size_t, std::size_t>;
 [[nodiscard]] inline Sparse Unit(std::size_t size){
@@ -24,12 +24,12 @@ TEST(chebyshov, b_zero){
         xBeginVec[i] = std::log(i + 1) * std::sin(i) * std::exp(i);
     }
     Vector xBegin(xBeginVec);
-    auto pseudo_solve = Chebyshov(unit, b, xBegin, iter, std::make_pair(1, 1), tolerance);
-    std::cout << "absolute error: " << std::format("{:.10f}", pseudo_solve.second) << std::endl;
-    std::cout << "required error: " << tolerance << std::endl;
+    auto [solve, error] = Chebyshov(unit, b, xBegin, iter, std::make_pair(1, 1), tolerance);
+
     for(std::size_t i = 0; i < n; ++i){
-        EXPECT_NEAR(pseudo_solve.first[i], static_cast<double>(0), tolerance);
+        EXPECT_NEAR(solve[i], static_cast<double>(0), tolerance);
     }
+    EXPECT_LE(error, tolerance);
 }
 TEST(chebyshov, with_fixed_mtx){
     std::size_t n = 2;
@@ -50,12 +50,12 @@ TEST(chebyshov, with_fixed_mtx){
     double l_max = 0.5 * (7 + std::sqrt(5));
     double l_min = 0.5 * (7 - std::sqrt(5));
 
-    auto pseudo_solve = Chebyshov(mtx, b, xBegin, iter, std::make_pair(l_min, l_max), tolerance);
-    std::cout << "absolute error: " << std::format("{:.10f}", pseudo_solve.second) << std::endl;
-    std::cout << "required error: " << tolerance << std::endl;
+    auto [solve, error] = Chebyshov(mtx, b, xBegin, iter, std::make_pair(l_min, l_max), tolerance);
+
     for(std::size_t i = 0; i < n; ++i){
-        EXPECT_NEAR(pseudo_solve.first[i], static_cast<double>(1), tolerance);
+        EXPECT_NEAR(solve[i], static_cast<double>(1), tolerance);
     }
+    EXPECT_LE(error, tolerance);
 }
 TEST(chebyshov, for_fixed_mtx){
     std::size_t n = 3;
@@ -82,10 +82,10 @@ TEST(chebyshov, for_fixed_mtx){
     double l_min = 4 - std::sqrt(2);
     double l_max = 4 + std::sqrt(2);
 
-    auto pseudo_solve = Chebyshov(mtx, b, xBegin, iter, std::make_pair(l_min, l_max), tolerance);
-    std::cout << "absolute error: " << std::format("{:.10f}", pseudo_solve.second) << std::endl;
-    std::cout << "required error: " << tolerance << std::endl;
+    auto [solve, error] = Chebyshov(mtx, b, xBegin, iter, std::make_pair(l_min, l_max), tolerance);
+
     for(std::size_t i = 0; i < n; ++i){
-        EXPECT_NEAR(pseudo_solve.first[i], static_cast<double>(1), tolerance);
+        EXPECT_NEAR(solve[i], static_cast<double>(1), tolerance);
     }
+    EXPECT_LE(error, tolerance);
 }

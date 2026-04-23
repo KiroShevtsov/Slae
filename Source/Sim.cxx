@@ -144,14 +144,12 @@ constexpr double singular = 1e-7;
 std::pair<Vector, double> Symmetric::GaussZeidel_S(const Sparse& mtx, const Vector& b, const Vector& vBegin, 
                 std::size_t iter, double rho, const double& tolerance,
                     const std::function<void(std::size_t, double)>& c) {
-    Vector v = vBegin;
-    double delta = (mtx * vBegin - b).linalg_norm;
-
-    auto fx = [&mtx, &b, &vBegin](const Vector& x) -> Vector {
+    auto lambda = [&mtx, &b](const Vector& x) -> Vector {
         Vector u = x;
         std::size_t s = mtx.nx_;
         for(std::size_t i = 0; i < s; ++i) {
             double current = 0;
+            /*x_i + 0.5 = inv(D + L) @ (b - Ux_i)*/
             for(std::size_t l = 0; l < i; ++l) {
                 current += mtx(i, l) * u[l];
             }
@@ -165,6 +163,7 @@ std::pair<Vector, double> Symmetric::GaussZeidel_S(const Sparse& mtx, const Vect
         Vector res = u;
         for(long long i = static_cast<long long>(s) - 1; i >= 0; --i) {
             double current = 0;
+            /*x_i + 0.5 = inv(D + U) @ (b - Lx_i + 0.5)*/
             for(std::size_t j = 0; j < static_cast<std::size_t>(i); ++j) {
                 current += mtx(i, j) * u[j];
             }
@@ -177,32 +176,40 @@ std::pair<Vector, double> Symmetric::GaussZeidel_S(const Sparse& mtx, const Vect
         }
         return res;
     };
-    
-    Vector yBegin = vBegin;
-    /*first iteration symmetric Gauss-Zeidel*/
-    Vector res = fx(yBegin);
-    double w = 1;
-    double wNext = 2 / (2 - rho * rho);
+    std::size_t s = vBegin.dim;
+    double delta = 0;
+    /*i = 1*/
+    Vector vPrev = vBegin;
+    Vector vCurrent = vBegin;
 
-    for(std::size_t i = 2; i < iter + 1; ++i) {
-        Vector z = fx(res);
-        Vector current = (z - yBegin) * wNext + yBegin;
-        yBegin = std::exchange(res, current);
-        /*w[i]*/
-        w = wNext;
+    Vector firstStep = lambda(vCurrent);
+    Vector subs = (firstStep - vPrev) * static_cast<double>(1) + vPrev;
+    std::swap(vPrev, vCurrent);
+    std::swap(vCurrent, subs);
+    delta = (mtx * subs - b).linalg_norm;
+
+    double omega = 2 / (2 - rho * rho); 
+    for(std::size_t i = 2; i <= iter; ++i) {
         /*w[i + 1]*/
-        wNext = 1 / (1 - 0.25 * (w * rho * rho));
-        double error = (mtx * res - b).linalg_norm;
+        double temp = 1 / (1 - 0.25 * (rho * rho * omega));
+        /*Py[i] + c*/
+        Vector step = lambda(vCurrent);
+        
+        Vector tempVec = (step - vPrev) * temp + vPrev;
+        std::swap(vPrev, vCurrent);
+        std::swap(vCurrent, tempVec);
+        omega = temp;
 
+        double error = (mtx * tempVec - b).linalg_norm;
         /*callback*/
-        if (c) {c(i, error);}
+        if(c) { c(i, error); }
 
-        if (error < tolerance) {
+        if(error < tolerance) {
             double absoluteDelta = error;
-            return {res, absoluteDelta};
+            return {tempVec, absoluteDelta};
         }
         delta = error;
     }
     double absoluteDelta = delta;
-    return {res, absoluteDelta};
+    return {vCurrent, absoluteDelta};
 }

@@ -11,7 +11,7 @@ print(f"max: {max(eigenvalues)}")
 
 df = pd.read_csv('build/errors.txt', sep=' ', names=['method', 'iter', 'error_it'])
 df_times = pd.read_csv('build/times.txt', sep=' ', names=['method', 'time_sec', 'error_t'])
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 8))
 
 for name, group in df.groupby('method'):
     ax1.semilogy(group['iter'], group['error_it'], label=name, markevery=10, marker='.')

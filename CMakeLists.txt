@@ -23,6 +23,10 @@ target_link_libraries(qr_plot PRIVATE slae_lib)
 add_executable(sim_methods Charts/Cxx/simple_iteration.cxx)
 target_link_libraries(sim_methods PRIVATE slae_lib)
 
+#contour
+add_executable(contour Charts/Cxx/contour.cxx)
+target_link_libraries(contour PRIVATE slae_lib)
+
 enable_testing()
 find_package(GTest REQUIRED)
 add_executable(slae_test 

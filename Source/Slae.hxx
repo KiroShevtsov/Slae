@@ -10,11 +10,6 @@ class Vector{
 public:
     std::size_t dim;
     double linalg_norm;
-    Vector(std::size_t size, double value) : dim(size) {
-        if(size == 0) {throw std::invalid_argument("Vector is empty");}
-        v_.assign(size, value);
-        linalg_norm = std::sqrt(size) * value;
-    }
     Vector(const std::vector<double>& v) : v_(v), dim(v.size()){
         if(v.empty()){throw std::invalid_argument("Vector is empty");}
         double xx = 0;

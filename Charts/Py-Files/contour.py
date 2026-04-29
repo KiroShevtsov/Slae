@@ -28,7 +28,7 @@ def k(alpha, beta):
                   alpha * beta * (lMax + lMin) * np.dot(vMax, vMin))  + \
                     np.dot(b, vMin) * alpha + np.dot(b, vMax) * beta
 
-data = np.loadtxt('build/proj.txt')
+data = np.loadtxt('Output/proj.txt')
 alpha = data[:, 0]
 beta = data[:, 1]
 #min k(x)

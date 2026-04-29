@@ -1,6 +1,6 @@
 #include <iostream>
 #include <Slae.hxx>
-#include <fstream>
+#include <Utility.hxx>
 using key = std::pair<std::size_t, std::size_t>;
 constexpr std::size_t iter = 50;
 constexpr double tau = 0.110;
@@ -22,7 +22,7 @@ int main() {
     Vector vMin({0.64, -0.48, -0.58});
     Vector vMax({0.75, 0.26, 0.60});
 
-    std::ofstream proj("proj.txt");
+    SlaeIo::Output file("proj.txt");
     std::vector<Vector> result;
     for(std::size_t i = 1; i <= iter; ++i) {
         auto [current, errorCurrent] = SimpleIteration(mtx, b * (-1), vBegin, i, tau, tolerance);
@@ -33,7 +33,7 @@ int main() {
         /*x = alpha @ vMin + beta @ vMax in this basis*/
         double alpha = stepProj * (vMin);
         double beta  = stepProj * (vMax);
-        proj << alpha << " " << beta << std::endl;
+        file.stream_ << alpha << " " << beta << std::endl;
     }
     return 0;
 }

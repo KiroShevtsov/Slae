@@ -1,6 +1,6 @@
 #include <Slae.hxx>
 #include <chrono>
-#include <fstream>
+#include <Utility.hxx>
 #include <iostream>
 using key = std::pair<std::size_t, std::size_t>;
 inline Sparse CreateSparse(std::size_t nx){
@@ -22,8 +22,9 @@ constexpr double rho = 0.9;
 constexpr std::pair<double, double> lambdas = {0.105, 20.09};
 int main() {
     auto [lMin, lMax] = lambdas;
-    std::ofstream plot("errors.txt");
-    std::ofstream times("times.txt");
+    // std::ofstream plot("errors.txt");
+    SlaeIo::Output plot("errors.txt");
+    SlaeIo::Output times("times.txt");
     
     Sparse mtx = CreateSparse(size);
     Vector b = Vector(std::vector<double>(size, 10.0));
@@ -31,7 +32,7 @@ int main() {
 
     auto logger = [&plot](const std::string& name) {
         return [&plot, name](std::size_t it, double e) {
-            plot << name << " " << it << " " << e << "\n";
+            plot.stream_ << name << " " << it << " " << e << "\n";
         };
     };
     
@@ -50,7 +51,7 @@ int main() {
         auto end = std::chrono::steady_clock::now();
         s = v;
         t_sim += std::chrono::duration<double>(end - start).count();
-        times << "sim" << " " << t_sim << " " << e << "\n";
+        times.stream_ << "sim" << " " << t_sim << " " << e << "\n";
     }
     
     Vector g_z = x0;
@@ -60,7 +61,7 @@ int main() {
         auto end = std::chrono::steady_clock::now();
         g_z = v;
         t_gz += std::chrono::duration<double>(end - start).count();
-        times << "gauss-zeidel" << " " << t_gz << " " << e << "\n";
+        times.stream_ << "gauss-zeidel" << " " << t_gz << " " << e << "\n";
     }
     
     Vector j = x0;
@@ -70,7 +71,7 @@ int main() {
         auto end = std::chrono::steady_clock::now();
         j = v;
         t_jacobi += std::chrono::duration<double>(end - start).count();
-        times << "jacobi" << " " << t_jacobi << " " << e << "\n";
+        times.stream_ << "jacobi" << " " << t_jacobi << " " << e << "\n";
     }
 
     Vector ch = x0;
@@ -80,7 +81,7 @@ int main() {
         auto end = std::chrono::steady_clock::now();
         ch = v;
         t_ch += std::chrono::duration<double>(end - start).count();
-        times << "chebyshov" << " " << t_ch << " " << e << "\n";
+        times.stream_ << "chebyshov" << " " << t_ch << " " << e << "\n";
     }
 
     Vector symmetric_gz = x0;
@@ -90,7 +91,7 @@ int main() {
         auto end = std::chrono::steady_clock::now();
         symmetric_gz = v;
         t_symmetric += std::chrono::duration<double>(end - start).count();
-        times << "sym_gz" << " " << t_symmetric << " " << e << "\n";
+        times.stream_ << "sym_gz" << " " << t_symmetric << " " << e << "\n";
     }
     return 0;
 }

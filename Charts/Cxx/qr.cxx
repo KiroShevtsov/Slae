@@ -1,5 +1,5 @@
 #include <Slae.hxx>
-#include <fstream>
+#include <Utility.hxx>
 #include <random>
 #include <iostream>
 /*alpha - is density of matrix*/
@@ -20,13 +20,14 @@ std::vector<double> Mtx(std::size_t nx, std::size_t ny, double alpha, double min
     return res;
 }
 int main(){
-    std::size_t n = 4;
+    std::size_t n = 3;
     std::vector<double> mtxVec = Mtx(n, n, 1, 0, 1);
     Matrix mtx(n, n, mtxVec);
     auto [q, r] = Qr(mtx);
-    std::ofstream file("data.txt");
-    file << "X" << "\n" << mtx;
-    file << "Q" << "\n" << q;
-    file << "R" << "\n" << r;
+    // std::ofstream file("data.txt");
+    SlaeIo::Output file("data.txt");
+    file.stream_ << "X" << "\n" << mtx;
+    file.stream_ << "Q" << "\n" << q;
+    file.stream_ << "R" << "\n" << r;
     return 0;
 }

@@ -3,7 +3,7 @@ import numpy as np
 alpha = []
 t_dense = []
 t_sparse = []
-with open("build/data.txt", "r") as file:
+with open("Output/data.txt", "r") as file:
     for line in file:
         s = line.split(" ")
         alpha.append(float(s[0]))

@@ -1,7 +1,7 @@
 #include <Slae.hxx>
 #include <chrono>
-#include <fstream>
 #include <random>
+#include <Utility.hxx>
 #include <iostream>
 template <typename T> double IterationTime(T&& function, std::size_t iter){
     auto start = std::chrono::steady_clock::now();
@@ -39,10 +39,8 @@ int main(){
         }
         Vector ksi(k);
 
-        std::ofstream ofs("data.txt");
-        if(!ofs.is_open()){
-            throw std::runtime_error("didnt open");
-        }
+        // std::ofstream ofs("data.txt");
+        SlaeIo::Output ofs("data.txt");
 
         std::vector<double> density;
         std::size_t iter = 100;
@@ -69,9 +67,8 @@ int main(){
             
             double t_dense = IterationTime([&](){Vector r = first * ksi;}, density.size());
             double t_sparse = IterationTime([&](){Vector r = second * ksi;}, density.size());
-            ofs << alpha << " " << t_dense << " " << t_sparse << std::endl;
+            ofs.stream_ << alpha << " " << t_dense << " " << t_sparse << std::endl;
         }
-        ofs.close();
     } catch(std::exception& e){
         std::cout << e.what() << std::endl;
     }

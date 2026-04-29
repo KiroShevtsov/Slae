@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.lines import Line2D
-with open('build/data.txt', 'r') as f:
+with open('Output/data.txt', 'r') as f:
     lines = f.readlines()
 x_start = lines.index('X\n') + 1
 q_start = lines.index('Q\n') + 1
